@@ -168,6 +168,10 @@ Declared on 2026-10-16, before any data file was opened and before any model was
 | (ii) | Logistic regression versus LightGBM | Every primary metric (budget miss, realized FPR, TPR, alert volume, precision, FPR ratio) for logistic regression, set against the same quantities for LightGBM. |
 | (iii) | FPR targets of 1%, 2% and 10% in addition to 5% (exploratory) | Every strategy rerun at each target on the same scores. For target f, the label-free primary strategy flags the top f of each month's scores and the secondary one matches the validation alert rate at f. Budget miss is measured against f. Labelled "exploratory" wherever reported. |
 | (iv) | Delayed-label lags 2 and 3 | Lag 1 is part of the primary comparison. Lags 2 and 3 are reported with cells marked "not available" where the source month is a training month. |
+| (v) | Group-wise static thresholds (exploratory) | One threshold per age group, set on validation month 3 so that each group's FPR on that month is at most 5% by the rule in the Thresholds section, then held fixed. Added 2026-10-16 before any data was used. |
+| (vi) | Group-wise label-free (exploratory) | Each test month, within each age group separately, flag the top 5% of that group's scores. Added 2026-10-16 before any data was used. |
+
+Strategies (v) and (vi) use the protected attribute (age group, primary definition) at decision time. They are reported as diagnostics of where the FPR gap comes from, not as recommendations, and every table or sentence that shows them says so.
 
 ## Data files
 
