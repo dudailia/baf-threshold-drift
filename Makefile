@@ -1,6 +1,6 @@
 PY := .venv/bin/python
 
-.PHONY: all setup test audit train evaluate mechanism tables check
+.PHONY: all setup test guard audit train evaluate mechanism tables check
 
 all: test audit train evaluate mechanism tables check
 
@@ -14,11 +14,14 @@ test:
 audit:
 	$(PY) -m src.audit
 
-# train and evaluate are added once PREDICTIONS.md is committed and the audit has been reviewed.
-train:
+# train and evaluate refuse to run unless PREDICTIONS.md is committed and unchanged (src/guard.py).
+guard:
+	$(PY) -m src.guard
+
+train: guard
 	@echo "train: not implemented yet" && exit 1
 
-evaluate:
+evaluate: guard
 	@echo "evaluate: not implemented yet" && exit 1
 
 mechanism:
