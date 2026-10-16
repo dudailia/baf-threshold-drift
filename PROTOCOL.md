@@ -31,7 +31,7 @@ Two caveats about the repo notebooks. First, they do not run as written: the var
 | 5 | Age binarized at 50, over 50 vs 50 or under | corrected: the sources disagree (Sec 3.2 p6; notebook cell 10; Datasheet A17 p5; variants notebook cell 7) | Paper Sec 3.2: "separating applicants with age >50 in one group and ≤50 in the other group." Empirical notebook cell 10: `X_test["customer_age"]>=50` labelled "Older". Datasheet A17: "we binarize this feature based on a threshold (< 50, ≥ 50)". Variants notebook cell 7 builds the sampling groups with `customer_age > 50`. Because `customer_age` is rounded to the decade (Datasheet A7 p2), ">50" means 60 and over while ">=50" means 50 and over. These are different groups. The data audit will report the group sizes and prevalences under both definitions and compare them with Table 1. |
 | 5b | Group sizes and prevalence by group | confirmed (Table 1 p7; Sec 5 p9; Datasheet A17 p5) | Table 1, Base: majority 77% at 0.9% prevalence, minority 23% at 1.8%. Original data: 80% at 1%, 20% at 2%. Sec 5: "approximately an 80/20 split" and prevalence "approximately 2 times larger for the older group". Table 1 also lists "Global ... 1.8%", which does not match the Base group values (77% x 0.9% + 23% x 1.8% is about 1.1%). The audit will measure it. |
 | 6 | Variant definitions | confirmed with one discrepancy (Sec 3.4 and Table 1 p7; variants notebook cells 10 to 19) | See the variants table below. Variant IV: Table 1 gives 50/50 group sizes but variants notebook cell 17 sets `majority_size = 0.9`. The audit will measure which one the released file follows. |
-| 7 | 100 LightGBM models with random hyperparameters per dataset, fairness-blind; exact TPR and fairness ratio for Base | partly confirmed, partly corrected (Sec 4 p8; App A.2 p15; notebook cells 10 to 16) | Sec 4: "we sampled 100 hyperparameter configurations of LightGBM [...] and trained them on each dataset", and the analysis is limited to "fairness-blind models". Correction: the paper reports no exact numbers for these models. They appear only as a scatter plot (Figure 1, p8), and the notebook has no saved outputs. Reading Figure 1 by eye (approximate, not a reported value): the top 5 Base models sit near TPR 0.55 and FPR ratio 0.32 to 0.33, and the Base cloud spans roughly TPR 0.47 to 0.56. Other variants by eye: I near 0.53 / 0.65, II near 0.55 / 0.32, III near 0.76 / 0.35, IV near 0.42 to 0.44 / 0.33, V near 0.34 to 0.37 / 0.37. These visual readings are the only available sanity target, and they are good to about plus or minus 0.02. |
+| 7 | 100 LightGBM models with random hyperparameters per dataset, fairness-blind; exact TPR and fairness ratio for Base | partly confirmed, partly corrected (Sec 4 p8; App A.2 p15; notebook cells 10 to 16) | Sec 4: "we sampled 100 hyperparameter configurations of LightGBM [...] and trained them on each dataset", and the analysis is limited to "fairness-blind models". Correction: the paper reports no exact numbers for these models. They appear only as a scatter plot (Figure 1, p8), and the notebook has no saved outputs. Reading Figure 1 by eye (approximate, not a reported value): the top 5 Base models sit near TPR 0.55 and FPR ratio 0.32 to 0.33, and the Base cloud spans roughly TPR 0.47 to 0.56. Other variants by eye: I near 0.53 / 0.65, II near 0.55 / 0.32, III near 0.76 / 0.35, IV near 0.42 to 0.44 / 0.33, V near 0.34 to 0.37 / 0.37. These visual readings are the only available sanity target. They are used as a loose bound of about plus or minus 0.05, not as a pass/fail check (my choice, agreed with the user). |
 | 8 | Base top models near 0.3 FPR ratio | confirmed (Sec 4 p8) | Sec 4: "the base dataset alone provides a demanding fairness challenge, with the top performing models lying around 0.3 FPR ratio." |
 
 ### Variants (Sec 3.4 and Table 1, p7; variants notebook)
@@ -45,7 +45,7 @@ Two caveats about the repo notebooks. First, they do not run as written: the var
 | IV | prevalence disparity like II in the first six months, none in the last two | 50% / 50% | 0.3% / 1.7% in train, 1.5% / 1.5% in test | cell 17: `majority_size = 0.9`, disparity `[5,5,5,5,5,5,1,1]` (group size disagrees with Table 1) |
 | V | separability disparity in the first six months, removed in the last two; balanced sizes and prevalence | 50% / 50% | 1.1% / 1.1% | cells 18, 19: separability `[0.9]*6 + [0.05]*2` |
 
-Variants IV and V change at month 6. Any split must keep months 6 and 7 in the test period so that this shift is observed.
+Variants IV and V carry their injected bias in months 0 to 5 only and lose it after month 5 (Sec 3.4 p7: Variant IV "features prevalence disparities over the first six months, but no disparity for the remainder"; Variant V: "we add a separability bias component on the first six months, and remove it on the remainder"; variants notebook cells 17 and 19). The shift at month 6 is therefore a removal of bias, not the arrival of a new one. In Variant IV the group prevalences become equal; in Variant V the appended features stop separating the majority group's fraud. Any split must keep months 6 and 7 in the test period so that this shift is observed.
 
 ## Answers to the brief's questions
 
@@ -71,7 +71,7 @@ Sec 5 (p9) asks for other splits, "having part of the data for validation of the
 | Item | Status | Decision |
 |---|---|---|
 | Paper's split (train 0 to 5, test 6 to 7) | confirmed (Sec 3.2 p6) | Used only for the replication sanity check against Figure 1. It leaves 2 test months, fewer than the 4 the brief requires. |
-| Main split: train months 0, 1, 2; validation month 3; test months 4, 5, 6, 7 | my choice | One validation month and four test months, as the brief requires. Months 6 and 7 stay in test, so the Variant IV and V shift at month 6 falls inside the test period, with months 4 and 5 as test months before the shift. Cost: about 3/8 of the rows for training instead of 6/8, so absolute TPR will be lower than the paper's. The audit will report row and fraud counts per month to confirm there is enough data. |
+| Main split: train months 0, 1, 2; validation month 3; test months 4, 5, 6, 7 | my choice (approved by the user) | One validation month and four test months, as the brief requires. Months 6 and 7 stay in test, so the Variant IV and V bias removal at month 6 falls inside the test period, with months 4 and 5 as test months while the bias is still present. Cost: about 3/8 of the rows for training instead of 6/8, so absolute TPR will be lower than the paper's. The audit will report row and fraud counts per month to confirm there is enough data. |
 | Model trained on months 0 to 2 only, not refit on month 3 after tuning | my choice | The static threshold is set on month 3 scores. Those scores must come from a model that never saw month 3. |
 | Rows in more than one split | my choice (check) | Splits are disjoint by month by construction. The audit also hashes all columns and counts exact duplicate rows across splits, and reports the count. |
 
@@ -82,7 +82,7 @@ Sec 5 (p9) asks for other splits, "having part of the data for validation of the
 | Label `fraud_bool` | confirmed (Datasheet A8 p3; notebook cell 7) | |
 | Categorical columns | confirmed (notebook cell 7) | `payment_type`, `employment_status`, `housing_status`, `source`, `device_os`. Category lists are fit on training months. Categories unseen in training map to an "unknown" code. |
 | `customer_age` as a feature | confirmed (notebook cell 10) | Kept as a feature, as in the paper's fairness-blind baseline. |
-| `month` as a feature | confirmed that the paper's code uses it (notebook cell 10); exclusion is my choice, pending your approval | The brief says to exclude `month` unless the paper's protocol uses it, and the paper's code does use it. I propose to include it in the replication run only, to match the paper, and also to rerun the replication without it so the effect is measured. In the main study I propose to exclude it. With training months 0 to 2, every test month (4 to 7) lies outside the training range, so a tree can only treat it as "month 2 or later". That carries no transferable information and could tie the score to a month-specific base rate. This needs your sign-off because it departs from the literal rule. |
+| `month` as a feature | confirmed that the paper's code uses it (notebook cell 10); exclusion in the main study is my choice (approved by the user) | Main study: excluded. With training months 0 to 2, every test month (4 to 7) lies outside the training range, so a tree can only treat it as "month 2 or later". That carries no transferable information. Replication run: run twice, once with `month` (to match the paper's code) and once without, so the effect is measured. |
 | Appended `x1`, `x2` in Variants III and V | confirmed (`mvn.py` line 29) | Used as features if present in the released files, since they are the injected bias. The audit lists the columns of each file. |
 | Missing-value sentinels | confirmed (Datasheet A7 p2, p3) | Converted to NaN: -1 in `prev_address_months_count`, `current_address_months_count`, `bank_months_count`, `session_length_in_minutes`, `device_distinct_emails_8w`; any negative value in `intended_balcon_amount`. |
 | Sentinel handling for LightGBM | my choice | NaN handled natively by LightGBM. In the replication run the raw values are kept, to match the notebook. |
@@ -120,7 +120,7 @@ All thresholds use the rule "flag if score >= t". A threshold at FPR target f on
 | TPR at the applied threshold | confirmed as headline (Sec 3.2 p6) | TP / positives. |
 | Alert volume | my choice | Share of applications flagged. |
 | FPR per age group and FPR ratio (predictive equality) | confirmed (Sec 3.2 p6; notebook cell 13) | Ratio = min group FPR / max group FPR. |
-| Protected group | corrected (see claim 5) | Primary: `customer_age >= 50` vs `< 50`, matching the evaluation code that produced Figure 1 (notebook cell 10) and the datasheet (A17). Sensitivity: `customer_age > 50` vs `<= 50`, matching the paper text and the variant sampling code. Both are reported for the headline FPR ratio table. |
+| Protected group | corrected (see claim 5); choice of primary is my choice (approved by the user), final confirmation pending the audit | Primary: `customer_age >= 50` vs `< 50`, matching the evaluation code that produced Figure 1 (notebook cell 10) and the datasheet (A17). Sensitivity: `customer_age > 50` vs `<= 50`, matching the paper text and the variant sampling code. Both are reported for the headline FPR ratio table. The audit compares group sizes and prevalences under both definitions with Table 1 for each variant. If one definition matches clearly better, the user is told before any modelling, and the final choice is recorded in the Decision log below before the first model run. |
 | Precision | my choice | TP / alerts. |
 | Counts per month and age group | my choice, per your brief | Positives and negatives per cell. Cells with fewer than 30 positives are flagged, and their TPR is only shown with an interval. |
 | Alert share vs application share by age group | my choice, per your brief | Under both label-free strategies: each group's share of all alerts, next to its share of applications. |
@@ -138,13 +138,21 @@ All thresholds use the rule "flag if score >= t". A threshold at FPR target f on
 
 | Check | Status | Decision |
 |---|---|---|
-| Replication against Figure 1 | my choice | Paper split, `month` included, raw sentinels, notebook threshold rule, pooled oracle threshold over months 6 and 7. Compared with the visual readings in claim 7. The target is approximate (about plus or minus 0.02), and I sample 20 configurations, not 100, so my best model may sit lower than the paper's top 5. A gap of more than a few points stops the work for investigation. |
+| Replication against Figure 1 | my choice | Paper split, raw sentinels, notebook threshold rule, pooled oracle threshold over months 6 and 7, run once with `month` and once without. Compared with the visual readings in claim 7 as a loose bound of about plus or minus 0.05, not a pass/fail check. I sample 20 configurations, not 100, so my best model may sit lower than the paper's top 5. A result outside the loose bound is investigated and reported to the user before going further. |
 | Shuffled labels | my choice, per your brief | Labels permuted within training months only; the model must give TPR close to 5% at 5% FPR on test months. |
 | Feature drift | my choice, per your brief | Population stability index for the top 10 LightGBM features by gain, per variant. Reference is the pooled training months; each month 0 to 7 is compared with it. Numeric bins are reference deciles (with NaN as its own bin); categoricals use their categories. |
 | 10% sample run | my choice, per your brief | Stratified by month and label, Base only, end to end. Its numbers are pipeline checks and are not interpreted in any file. |
 
-## Open decisions that need your answer
+## Data files
 
-1. `month` as a feature: exclude in the main study, include (and also exclude) in the replication? See the Features table.
-2. Main split train 0 to 2, validation 3, test 4 to 7? The alternative, train 0 to 1, validation 2, test 3 to 7, gives five test months but trains on about a quarter of the data.
-3. Protected group: primary `>= 50` with `> 50` as sensitivity, or the reverse?
+The loader does not assume file names. It lists every file in `data/raw/`, and the mapping from file name to variant is written explicitly in `src/` only after the actual Kaggle names have been seen. It stops if it does not find exactly six variant files.
+
+## Decision log
+
+| Date | Decision |
+|---|---|
+| 2026-10-16 | `month` excluded in the main study; replication run with and without it. |
+| 2026-10-16 | Main split: train 0 to 2, validation 3, test 4 to 7 (my choice). |
+| 2026-10-16 | Protected group: `>= 50` primary, `> 50` sensitivity, subject to the audit check against Table 1. |
+| 2026-10-16 | Figure 1 readings are a loose sanity bound (about plus or minus 0.05), not pass/fail. |
+| pending | Final protected group definition, recorded here after the audit and before the first model run. |
