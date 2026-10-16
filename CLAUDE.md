@@ -27,6 +27,8 @@ Read PROTOCOL.md before changing any split, metric, group definition or threshol
 - Report seed spread (across 5 seeds) and bootstrap 95% intervals (1,000 resamples of applications within a month) separately. Never merge them into one interval.
 - If intervals overlap heavily, or the paired-bootstrap interval of a difference contains 0, call the difference inconclusive.
 - For every month and age group, record positive and negative counts. Flag cells with fewer than 30 positives and never report a TPR for such a cell without its interval.
+- Budget miss (realized FPR - 5%, signed and absolute) is the primary comparison between strategies. TPR is never shown without the realized FPR next to it, because all strategies sit on the same month's ROC curve and an overshoot buys TPR.
+- The oracle row is always shown and labelled as an upper bound.
 - No claims of beating the paper or of state of the art. Report null and negative results.
 - PREDICTIONS.md is written from the user's own predictions, committed before any modelling run, and never edited afterwards.
 

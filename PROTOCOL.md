@@ -117,6 +117,7 @@ All thresholds use the rule "flag if score >= t". A threshold at FPR target f on
 | Metric | Status | Definition |
 |---|---|---|
 | Realized FPR vs the 5% target | my choice | FP / negatives in the month. |
+| Budget miss | my choice (defined by the user) | Signed miss = realized FPR - 0.05; absolute miss = abs(realized FPR - 0.05). Reported per strategy, variant, model, seed and test month. Every strategy applies a threshold to the same model's scores on the same month, so every operating point lies on that month's ROC curve. A strategy's TPR is therefore fixed by its realized FPR, and a strategy that overshoots the budget can show higher TPR than the oracle. Budget miss is the primary comparison between strategies; TPR is secondary and only read together with realized FPR. |
 | TPR at the applied threshold | confirmed as headline (Sec 3.2 p6) | TP / positives. |
 | Alert volume | my choice | Share of applications flagged. |
 | FPR per age group and FPR ratio (predictive equality) | confirmed (Sec 3.2 p6; notebook cell 13) | Ratio = min group FPR / max group FPR. |
@@ -124,6 +125,20 @@ All thresholds use the rule "flag if score >= t". A threshold at FPR target f on
 | Precision | my choice | TP / alerts. |
 | Counts per month and age group | my choice, per your brief | Positives and negatives per cell. Cells with fewer than 30 positives are flagged, and their TPR is only shown with an interval. |
 | Alert share vs application share by age group | my choice, per your brief | Under both label-free strategies: each group's share of all alerts, next to its share of applications. |
+
+### Reporting rules
+
+- TPR is never shown without the realized FPR of the same strategy, variant and month next to it.
+- The oracle row is always shown, and always labelled "Oracle (upper bound, not deployable)".
+
+### Figures
+
+| File | Content |
+|---|---|
+| `figures/realized_fpr_by_month.png` | Realized FPR by test month per strategy, with the 5% target marked. |
+| `figures/tpr_by_month.png` | TPR by test month per strategy, with realized FPR shown alongside. |
+| `figures/fpr_ratio_by_month.png` | Age FPR ratio by test month per strategy. |
+| `figures/roc_operating_points.png` | For each test month, the ROC curve of that month's scores, with each strategy's operating point marked. |
 
 ### Uncertainty
 
