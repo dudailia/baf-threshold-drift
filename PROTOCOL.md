@@ -147,7 +147,7 @@ All thresholds use the rule "flag if score >= t". A threshold at FPR target f on
 | Seed spread | my choice | Mean, standard deviation, min and max over 5 seeds of each point estimate. |
 | Bootstrap | my choice, per your brief | 1,000 resamples of applications within a month. Each strategy's threshold is re-estimated inside each resample from resampled source data (validation month for static, month m - k for delayed-label, the resampled test month for label-free and oracle), so threshold estimation uncertainty is included. Reported per seed; tables show the reference seed (seed 0), and the full per-seed intervals go to the results CSV. |
 | Seed spread and bootstrap kept separate | my choice, per your brief | Never combined into one interval. |
-| Strategy comparisons | my choice | Paired bootstrap: same resampled rows for both strategies, interval of the difference. A difference is called inconclusive if that interval contains 0, or if the two marginal intervals overlap heavily. |
+| Strategy comparisons | my choice | Paired bootstrap: same resampled rows for both strategies, interval of the difference. A difference is called inconclusive if that interval contains 0, or if the two marginal intervals overlap heavily. "Overlap heavily" means the overlap of the two marginal 95% intervals is at least 50% of the width of the shorter one (declared 2026-10-16, before any data). Otherwise the difference is reported as "differs". |
 
 ### Sanity checks
 

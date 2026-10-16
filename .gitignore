@@ -4,3 +4,6 @@ __pycache__/
 .venv/
 .pytest_cache/
 .DS_Store
+results/predictions/
+results/checkpoints/
+results/logs/
