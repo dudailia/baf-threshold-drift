@@ -35,7 +35,7 @@ PAIRS = (
     + [(s, "oracle") for s in ["label_free_top", "label_free_val_rate", "delayed_lag1"]]
 )
 # Text constants allowed in the write-up templates (months, seeds, lags, targets, protocol sizes, citations).
-TEXT_CONSTANTS = list(range(0, 11)) + [30, 50, 95, 100, 1000, 2000, 2022, 2026, 25, 75, 5, 20, 15, 16, 3.1, 3.2, 3.4, 4.2, 4.3,
+TEXT_CONSTANTS = list(range(0, 13)) + [1000000, 0.3, 0.6, 30, 50, 95, 100, 1000, 2000, 2022, 2026, 25, 75, 5, 20, 15, 16, 3.1, 3.2, 3.4, 4.2, 4.3,
                                       2211.13358, 2206.13183, 0.05, 2.5, 97.5, 1.5, 0.85, 0.02, 0.75, 0.25, 0.9, 0.5, 0.55, 40, 60, 0.85]
 
 

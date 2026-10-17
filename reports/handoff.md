@@ -1,6 +1,6 @@
 # Handoff note
 
-Last updated 2026-10-16, during Stage F to G of the unattended pass. Read CLAUDE.md, PROTOCOL.md and this file before continuing. The running log with timestamps is reports/progress.md.
+Last updated 2026-10-16, after Stage K (write-up); waiting for the user's review. Read CLAUDE.md, PROTOCOL.md and this file before continuing. The running log with timestamps is reports/progress.md.
 
 ## State
 
@@ -17,12 +17,12 @@ Last updated 2026-10-16, during Stage F to G of the unattended pass. Read CLAUDE
 | F Replication | done, within loose bound | results/replication.csv (6d0ce24) |
 | F Shuffled-label check | FAILED, tripwire fired, kept as a caveat | results/shuffled.csv, results/tripwires.json (6d0ce24) |
 | F PSI (Base, check model) | done | results/psi.csv (recomputed for all variants with tuned models after H) |
-| F post hoc diagnostics | in progress | src/diagnostics.py, tests/test_fit_on_train_only.py |
-| G 10% sample | next | `make sample` writes to results/sample_run/ (gitignored); never interpret |
-| H Full run | to do | `make train`, `make evaluate` in background; logs in results/logs/; checkpoints in results/checkpoints/ |
-| I Independent check | to do | prompt ready in the scratchpad (independent_check_prompt.md); fresh subagent recomputes from results/predictions/ |
-| J Secondary analyses | to do | only those declared in PROTOCOL.md; anything else marked post hoc |
-| K Write-up | to do | docs/*.template.md rendered by `make tables`, checked by `make check` |
+| F post hoc diagnostics | done | src/diagnostics.py, tests/test_fit_on_train_only.py (3fa2ccf) |
+| G 10% sample | done, clean | results/sample_run/ (gitignored; never interpreted) |
+| H Full run | done, no evaluation tripwires | results/*.csv, figures/ (9c04644) |
+| I Independent check | done, 0 mismatches | results/independent_check.csv, reports/independent_check/ (4d640ce, 5d0954c) |
+| J Secondary analyses | done, only pre-declared ones | RESULTS.md section 8 |
+| K Write-up | done | README.md, RESULTS.md, reports/one_pager.md from docs/*.template.md; `make check` passes |
 
 ## Decisions in force
 
@@ -38,4 +38,4 @@ Last updated 2026-10-16, during Stage F to G of the unattended pass. Read CLAUDE
 
 ## Next step
 
-Finish the post hoc diagnostics, commit, then run Stage G (`make sample`), check for failed tests, NaN in available rows and missing strategies, then Stage H in the background.
+Wait for the user's review of README.md, RESULTS.md and reports/one_pager.md. To change prose, edit docs/*.template.md and run `make tables check`; never edit the rendered files or PREDICTIONS.md.

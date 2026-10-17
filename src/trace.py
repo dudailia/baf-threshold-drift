@@ -122,6 +122,8 @@ FORMATS = {
     "pct1": lambda v: f"{100 * v:.1f}",
     "pct2": lambda v: f"{100 * v:.2f}",
     "pt2": lambda v: f"{100 * v:+.2f}",
+    "apt2": lambda v: f"{abs(100 * v):.2f}",
+    "pct0": lambda v: f"{100 * v:.0f}",
     "f2": lambda v: f"{v:.2f}",
     "f3": lambda v: f"{v:.3f}",
     "int": lambda v: f"{int(round(v)):,}",

@@ -251,7 +251,7 @@ def exploratory_targets(results, variant=None):
 
 def csv_table(results, name):
     """A small results file shown as is, floats to 4 significant decimals."""
-    df = results[name]
+    df = results[name].drop(columns=["predictions_commit"], errors="ignore")
     rows = [[f"{x:.4f}" if isinstance(x, float) else x for x in r] for r in df.itertuples(index=False)]
     return _md(list(df.columns), rows)
 

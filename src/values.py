@@ -24,6 +24,91 @@ def _sel(df):
     return df[(df.model == PRIMARY_MODEL) & np.isclose(df.fpr_target, PRIMARY_TARGET) & (df.age_def == PRIMARY_AGE)]
 
 
+DEPLOY = ["static", "label_free_top", "label_free_val_rate", "delayed_lag1"]
+GLOBAL = DEPLOY + ["oracle"]
+
+
+def derived(s, p, full):
+    """Summaries over variants and months, computed from seed means in summary.csv."""
+    d = {}
+    m = s.pivot_table(index=["variant", "month", "strategy"], columns="metric", values="mean")
+
+    def col(strategy, metric, months=(4, 5, 6, 7), variants=VARIANTS):
+        x = m.xs(strategy, level="strategy")[metric]
+        return x[x.index.get_level_values("variant").isin(variants) & x.index.get_level_values("month").isin(months)]
+
+    for name, months in (("m4", (4,)), ("m567", (5, 6, 7)), ("all", (4, 5, 6, 7))):
+        for strategy in GLOBAL:
+            x = col(strategy, "budget_miss", months)
+            d[f"derived/{strategy}/miss_{name}/min"], d[f"derived/{strategy}/miss_{name}/max"] = float(x.min()), float(x.max())
+            ax = x.abs()
+            d[f"derived/{strategy}/absmiss_{name}/max"] = float(ax.max())
+            d[f"derived/{strategy}/absmiss_{name}/n_within_0.5pt"] = int((ax <= 0.005).sum())
+            d[f"derived/{strategy}/absmiss_{name}/n_cells"] = int(len(ax))
+    # Which deployable strategy has the smallest absolute miss in each variant-month.
+    absmiss = m["abs_budget_miss"].unstack("strategy")[DEPLOY]
+    best = absmiss.idxmin(axis=1)
+    for strategy in DEPLOY:
+        d[f"derived/{strategy}/n_smallest_absmiss"] = int((best == strategy).sum())
+    # Paired verdicts against static on absolute miss.
+    pv = p[(p.seed == 0) & (p.comparator == "static") & (p.metric == "abs_budget_miss")]
+    for strategy in ("label_free_top", "label_free_val_rate", "delayed_lag1"):
+        q = pv[pv.strategy == strategy]
+        d[f"derived/{strategy}/vs_static/n_differs_smaller"] = int(((q.verdict == "differs") & (q["diff"] < 0)).sum())
+        d[f"derived/{strategy}/vs_static/n_differs_larger"] = int(((q.verdict == "differs") & (q["diff"] > 0)).sum())
+        d[f"derived/{strategy}/vs_static/n_inconclusive"] = int((q.verdict == "inconclusive").sum())
+    # Spread of the FPR ratio across global-threshold strategies, within a variant-month.
+    ratio = m["fpr_ratio"].unstack("strategy")[GLOBAL]
+    spread = ratio.max(axis=1) - ratio.min(axis=1)
+    d["derived/ratio_spread_across_strategies/max"] = float(spread.max())
+    for vname in VARIANTS:
+        r = ratio.loc[vname]
+        d[f"derived/{vname}/ratio_global/min"], d[f"derived/{vname}/ratio_global/max"] = float(r.min().min()), float(r.max().max())
+        for strategy in ("groupwise_static", "groupwise_label_free"):
+            g = col(strategy, "fpr_ratio", variants=[vname])
+            d[f"derived/{vname}/{strategy}/ratio/min"], d[f"derived/{vname}/{strategy}/ratio/max"] = float(g.min()), float(g.max())
+        for strategy in GLOBAL:
+            t = col(strategy, "tpr", variants=[vname])
+            d[f"derived/{vname}/{strategy}/tpr_m45"] = float(t[t.index.get_level_values("month").isin([4, 5])].mean())
+            d[f"derived/{vname}/{strategy}/tpr_m67"] = float(t[t.index.get_level_values("month").isin([6, 7])].mean())
+        sh = col("label_free_top", "alert_share_old", (6, 7), [vname])
+        d[f"derived/{vname}/label_free_top/alert_share_old_m67/min"] = float(sh.min())
+        d[f"derived/{vname}/label_free_top/alert_share_old_m67/max"] = float(sh.max())
+        ap = col("label_free_top", "application_share_old", (6, 7), [vname])
+        d[f"derived/{vname}/application_share_old_m67/max"] = float(ap.max())
+    for vname in VARIANTS:
+        fpr = col("static", "realized_fpr", variants=[vname])
+        mo = fpr.index.get_level_values("month")
+        d[f"derived/{vname}/static/fpr_m45"] = float(fpr[mo.isin([4, 5])].mean())
+        d[f"derived/{vname}/static/fpr_m67"] = float(fpr[mo.isin([6, 7])].mean())
+        for lag in ("delayed_lag1", "delayed_lag2", "delayed_lag3"):
+            x = col(lag, "budget_miss", variants=[vname])
+            d[f"derived/{vname}/{lag}/miss/min"], d[f"derived/{vname}/{lag}/miss/max"] = float(x.min()), float(x.max())
+    gw = pd.concat([col(st, "fpr_ratio") for st in ("groupwise_static", "groupwise_label_free")])
+    d["derived/groupwise/ratio/min"], d["derived/groupwise/ratio/max"] = float(gw.min()), float(gw.max())
+    # TPR cost of group-wise label-free against label-free top 5%.
+    cost = col("groupwise_label_free", "tpr") - col("label_free_top", "tpr")
+    d["derived/groupwise_label_free_minus_label_free_top/tpr/min"] = float(cost.min())
+    d["derived/groupwise_label_free_minus_label_free_top/tpr/max"] = float(cost.max())
+    # Secondary: logistic regression static miss, and the > 50 age definition FPR ratio range.
+    lr = full[(full.model == "logreg") & np.isclose(full.fpr_target, PRIMARY_TARGET) & (full.age_def == PRIMARY_AGE)
+              & (full.strategy == "static") & (full.metric == "budget_miss") & full.month.isin([5, 6, 7])]["mean"]
+    d["derived/logreg/static/miss_m567/min"], d["derived/logreg/static/miss_m567/max"] = float(lr.min()), float(lr.max())
+    alt = full[(full.model == PRIMARY_MODEL) & np.isclose(full.fpr_target, PRIMARY_TARGET) & (full.age_def == ">50")
+               & full.strategy.isin(GLOBAL) & (full.metric == "fpr_ratio")]["mean"]
+    d["derived/age_gt50/ratio_global/min"], d["derived/age_gt50/ratio_global/max"] = float(alt.min()), float(alt.max())
+    a = full[(full.model == PRIMARY_MODEL) & np.isclose(full.fpr_target, PRIMARY_TARGET) & (full.age_def == ">50")
+             & full.strategy.isin(GLOBAL) & (full.metric == "fpr_ratio")].pivot_table(index=["variant", "month"], columns="strategy", values="mean")
+    d["derived/age_gt50/ratio_spread_across_strategies/max"] = float((a.max(axis=1) - a.min(axis=1)).max())
+    for t in (0.01, 0.02, 0.10):
+        e = full[(full.model == PRIMARY_MODEL) & np.isclose(full.fpr_target, t) & (full.age_def == PRIMARY_AGE) & (full.strategy == "static")
+                 & (full.metric == "budget_miss") & full.month.isin([5, 6, 7])]
+        d[f"derived/target_{t}/static/m567_under/n"] = int((e["mean"] < 0).sum())
+        d[f"derived/target_{t}/static/m567/n"] = int(len(e))
+        d[f"derived/target_{t}/static/m567_under_base/n"] = int((e[e.variant == "Base"]["mean"] < 0).sum())
+    return d
+
+
 def build():
     R = config.RESULTS
     v = {}
@@ -48,6 +133,17 @@ def build():
                 if len(x):
                     v[f"range/{strategy}/{metric}/min/{gname}"] = float(x.min())
                     v[f"range/{strategy}/{metric}/max/{gname}"] = float(x.max())
+
+    v.update(derived(s, p, pd.read_csv(R / "summary.csv")))
+    c0 = ci[(ci.seed == 0) & (ci.metric == "budget_miss") & ci.month.isin([5, 6, 7])]
+    for strategy in ("static", "label_free_top"):
+        q = c0[c0.strategy == strategy]
+        v[f"derived/{strategy}/ci_m567_below_zero"] = int((q.hi < 0).sum())
+        v[f"derived/{strategy}/ci_m567_n"] = int(len(q))
+    v["predictions_commit"] = str(s["predictions_commit"].iloc[0])
+    ic = pd.read_csv(R / "independent_check.csv")
+    v["check/independent/tpr_sensitivity"] = float(ic["max_abs_diff_tpr"].max())
+    v["check/independent/n_rows"] = int(ic["rows_compared"].iloc[0])
 
     rep = pd.read_csv(R / "replication.csv")
     for r in rep.itertuples():
