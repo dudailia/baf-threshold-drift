@@ -71,4 +71,4 @@ Queue finished. Next step: the user's review of RESULTS_POSTHOC.md section 7 and
 | 4 clean rebuild | to do, after text is final | make clean, make all |
 | 5 claims audit | to do | fresh subagent |
 | 6 one-pager | to do | |
-| 7 hygiene | to do | reports/hygiene.md |
+| 7 hygiene | done | reports/hygiene.md: personal email in commit metadata (all commits), absolute paths in the verbatim checker scripts; no credentials, IDs, phone numbers, data or other-project references |
