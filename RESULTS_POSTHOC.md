@@ -69,3 +69,95 @@ Split B.
 With the threshold set on month 4, static is under budget in months 5 to 7 by 0.58 to 2.23 points, with 18 of 18 seed 0 intervals entirely below zero, as in the main study.
 
 Reading. The main study's static under-spend in months 5 to 7 holds when the threshold is set on month 3 (main study) or month 4 (split B), but reverses into an over-spend when it is set on month 2 (split A). What holds on every split is that a threshold set once misses the budget in later months, by 0.33 to 5.82 points on split A and 0.58 to 2.23 on split B; the sign is consistent with whether the validation month's negatives score higher or lower than the later months' (section 2). This contradicts the main study's wording that static "under-spends", which is true only for validation months 3 and 4. Label-free top 5% stays 0.24 to 1.04 points under budget on split A and 0.27 to 0.85 on split B, and delayed-label lag 1 swings from -1.79 to +1.47 points on split B, as in the main study.
+
+## 2. Mechanism (exploratory)
+
+Main study, LightGBM seed 0. The model was refit because models were not saved; the refit reproduces the saved scores exactly (largest absolute difference 0.000).
+
+Where month 3's static threshold falls in each month's negative scores (the quantile equals 1 minus the realized FPR), and the Kolmogorov-Smirnov distance between month 3 negatives' scores and month t negatives' scores.
+
+| Variant | Month | Quantile of month's negative scores at month 3's static threshold | Realized FPR % | KS distance to month 3 negatives |
+|---|---|---|---|---|
+| Base | 3 | 0.9500 | 5.00 | 0.0000 |
+| Base | 4 | 0.9495 | 5.05 | 0.0343 |
+| Base | 5 | 0.9690 | 3.10 | 0.0370 |
+| Base | 6 | 0.9604 | 3.96 | 0.0213 |
+| Base | 7 | 0.9710 | 2.90 | 0.0638 |
+| Variant I | 3 | 0.9500 | 5.00 | 0.0000 |
+| Variant I | 4 | 0.9435 | 5.65 | 0.0543 |
+| Variant I | 5 | 0.9649 | 3.51 | 0.0370 |
+| Variant I | 6 | 0.9588 | 4.12 | 0.0366 |
+| Variant I | 7 | 0.9659 | 3.41 | 0.0303 |
+| Variant II | 3 | 0.9500 | 5.00 | 0.0000 |
+| Variant II | 4 | 0.9499 | 5.01 | 0.0361 |
+| Variant II | 5 | 0.9704 | 2.96 | 0.0429 |
+| Variant II | 6 | 0.9626 | 3.74 | 0.0453 |
+| Variant II | 7 | 0.9667 | 3.33 | 0.0305 |
+| Variant III | 3 | 0.9500 | 5.00 | 0.0000 |
+| Variant III | 4 | 0.9488 | 5.12 | 0.0271 |
+| Variant III | 5 | 0.9673 | 3.27 | 0.0424 |
+| Variant III | 6 | 0.9589 | 4.11 | 0.0529 |
+| Variant III | 7 | 0.9731 | 2.69 | 0.0654 |
+| Variant IV | 3 | 0.9500 | 5.00 | 0.0000 |
+| Variant IV | 4 | 0.9492 | 5.08 | 0.0419 |
+| Variant IV | 5 | 0.9699 | 3.01 | 0.0454 |
+| Variant IV | 6 | 0.9627 | 3.73 | 0.0537 |
+| Variant IV | 7 | 0.9660 | 3.40 | 0.0344 |
+| Variant V | 3 | 0.9500 | 5.00 | 0.0000 |
+| Variant V | 4 | 0.9492 | 5.08 | 0.0301 |
+| Variant V | 5 | 0.9663 | 3.37 | 0.0330 |
+| Variant V | 6 | 0.9615 | 3.85 | 0.0388 |
+| Variant V | 7 | 0.9618 | 3.82 | 0.0405 |
+
+The negatives' score distributions differ from month 3's by KS distances of only 0.021 to 0.065, yet the threshold's quantile moves from 0.944 to 0.973: the drift that matters sits in the upper tail, and the KS distance tracks the miss only weakly (correlation -0.26 with the signed miss over the variant-months).
+
+Feature replacement. For each of the 10 features with the highest gain, the feature's values in month t negatives were replaced by draws from month 3 negatives of the same age group, and the static miss recomputed (five draws; "shrink" is the static absolute miss minus the absolute miss after replacement, so positive means the replacement moves the month toward budget).
+
+Base.
+
+| Rank | Feature | Month 4: static miss pt; shrink pt, mean (min to max) over draws | Month 5: static miss pt; shrink pt, mean (min to max) over draws | Month 6: static miss pt; shrink pt, mean (min to max) over draws | Month 7: static miss pt; shrink pt, mean (min to max) over draws |
+|---|---|---|---|---|---|
+| 1 | `housing_status` | +0.05; -1.07 (-1.09 to -1.05) | -1.90; -0.42 (-0.43 to -0.41) | -1.04; -0.71 (-0.73 to -0.67) | -2.10; -0.76 (-0.81 to -0.72) |
+| 2 | `device_os` | +0.05; -0.57 (-0.59 to -0.54) | -1.90; -0.28 (-0.31 to -0.23) | -1.04; -0.13 (-0.18 to -0.10) | -2.10; -0.25 (-0.29 to -0.19) |
+| 3 | `credit_risk_score` | +0.05; -0.12 (-0.16 to -0.07) | -1.90; -0.04 (-0.07 to -0.02) | -1.04; -0.03 (-0.05 to -0.00) | -2.10; -0.06 (-0.10 to -0.03) |
+| 4 | `name_email_similarity` | +0.05; +0.03 (+0.02 to +0.04) | -1.90; -0.08 (-0.10 to -0.07) | -1.04; -0.05 (-0.10 to -0.02) | -2.10; +0.06 (+0.01 to +0.09) |
+| 5 | `current_address_months_count` | +0.05; -0.31 (-0.34 to -0.29) | -1.90; -0.44 (-0.48 to -0.40) | -1.04; -0.40 (-0.44 to -0.37) | -2.10; -0.24 (-0.26 to -0.19) |
+| 6 | `prev_address_months_count` | +0.05; -0.61 (-0.65 to -0.58) | -1.90; -0.55 (-0.59 to -0.51) | -1.04; -0.55 (-0.57 to -0.53) | -2.10; -0.35 (-0.39 to -0.32) |
+| 7 | `income` | +0.05; -0.29 (-0.31 to -0.27) | -1.90; -0.30 (-0.32 to -0.26) | -1.04; -0.52 (-0.57 to -0.51) | -2.10; -0.32 (-0.35 to -0.28) |
+| 8 | `velocity_4w` | +0.05; -0.11 (-0.12 to -0.10) | -1.90; +0.01 (-0.01 to +0.02) | -1.04; -0.15 (-0.16 to -0.13) | -2.10; +0.08 (+0.06 to +0.11) |
+| 9 | `phone_home_valid` | +0.05; -0.06 (-0.08 to -0.04) | -1.90; +0.23 (+0.21 to +0.25) | -1.04; +0.09 (+0.04 to +0.13) | -2.10; +0.28 (+0.23 to +0.32) |
+| 10 | `date_of_birth_distinct_emails_4w` | +0.05; +0.03 (+0.02 to +0.03) | -1.90; -0.04 (-0.05 to -0.02) | -1.04; -0.21 (-0.22 to -0.20) | -2.10; -0.29 (-0.31 to -0.25) |
+
+Variant IV.
+
+| Rank | Feature | Month 4: static miss pt; shrink pt, mean (min to max) over draws | Month 5: static miss pt; shrink pt, mean (min to max) over draws | Month 6: static miss pt; shrink pt, mean (min to max) over draws | Month 7: static miss pt; shrink pt, mean (min to max) over draws |
+|---|---|---|---|---|---|
+| 1 | `housing_status` | +0.08; -0.98 (-1.00 to -0.93) | -1.99; -0.40 (-0.43 to -0.35) | -1.27; -0.70 (-0.73 to -0.69) | -1.60; -0.73 (-0.76 to -0.69) |
+| 2 | `customer_age` | +0.08; +0.06 (+0.05 to +0.07) | -1.99; -0.05 (-0.06 to -0.03) | -1.27; -0.08 (-0.10 to -0.07) | -1.60; -0.05 (-0.07 to -0.04) |
+| 3 | `device_os` | +0.08; -0.61 (-0.64 to -0.56) | -1.99; -0.33 (-0.36 to -0.31) | -1.27; -0.23 (-0.26 to -0.21) | -1.60; -0.32 (-0.34 to -0.30) |
+| 4 | `credit_risk_score` | +0.08; -0.04 (-0.07 to -0.03) | -1.99; -0.06 (-0.08 to -0.04) | -1.27; -0.15 (-0.16 to -0.13) | -1.60; -0.09 (-0.13 to -0.07) |
+| 5 | `name_email_similarity` | +0.08; -0.03 (-0.07 to -0.02) | -1.99; +0.04 (+0.01 to +0.06) | -1.27; +0.03 (-0.01 to +0.05) | -1.60; +0.17 (+0.14 to +0.19) |
+| 6 | `current_address_months_count` | +0.08; -0.13 (-0.16 to -0.10) | -1.99; -0.30 (-0.33 to -0.29) | -1.27; -0.29 (-0.30 to -0.26) | -1.60; -0.13 (-0.16 to -0.09) |
+| 7 | `date_of_birth_distinct_emails_4w` | +0.08; +0.02 (+0.00 to +0.03) | -1.99; +0.09 (+0.06 to +0.12) | -1.27; -0.06 (-0.09 to -0.03) | -1.60; -0.07 (-0.10 to -0.06) |
+| 8 | `phone_home_valid` | +0.08; -0.12 (-0.14 to -0.09) | -1.99; +0.17 (+0.15 to +0.19) | -1.27; -0.04 (-0.06 to -0.02) | -1.60; +0.24 (+0.20 to +0.26) |
+| 9 | `has_other_cards` | +0.08; -0.16 (-0.17 to -0.14) | -1.99; -0.12 (-0.14 to -0.10) | -1.27; -0.24 (-0.27 to -0.23) | -1.60; -0.30 (-0.33 to -0.27) |
+| 10 | `velocity_4w` | +0.08; +0.07 (+0.06 to +0.08) | -1.99; -0.12 (-0.13 to -0.11) | -1.27; -0.16 (-0.17 to -0.15) | -1.60; -0.24 (-0.25 to -0.22) |
+
+Variant V.
+
+| Rank | Feature | Month 4: static miss pt; shrink pt, mean (min to max) over draws | Month 5: static miss pt; shrink pt, mean (min to max) over draws | Month 6: static miss pt; shrink pt, mean (min to max) over draws | Month 7: static miss pt; shrink pt, mean (min to max) over draws |
+|---|---|---|---|---|---|
+| 1 | `x1` | +0.08; -0.02 (-0.06 to +0.03) | -1.63; -0.00 (-0.02 to +0.06) | -1.15; +0.03 (+0.01 to +0.06) | -1.18; +0.05 (-0.01 to +0.09) |
+| 2 | `x2` | +0.08; +0.02 (+0.00 to +0.04) | -1.63; -0.03 (-0.05 to +0.01) | -1.15; -0.01 (-0.05 to +0.01) | -1.18; +0.00 (-0.05 to +0.04) |
+| 3 | `customer_age` | +0.08; +0.06 (+0.03 to +0.07) | -1.63; -0.07 (-0.09 to -0.07) | -1.15; -0.05 (-0.06 to -0.03) | -1.18; -0.02 (-0.02 to -0.00) |
+| 4 | `housing_status` | +0.08; -0.77 (-0.79 to -0.74) | -1.63; -0.28 (-0.35 to -0.21) | -1.15; -0.48 (-0.51 to -0.42) | -1.18; -0.57 (-0.59 to -0.55) |
+| 5 | `device_os` | +0.08; -0.49 (-0.53 to -0.44) | -1.63; -0.24 (-0.27 to -0.22) | -1.15; -0.14 (-0.19 to -0.10) | -1.18; -0.24 (-0.31 to -0.19) |
+| 6 | `credit_risk_score` | +0.08; +0.03 (+0.01 to +0.06) | -1.63; -0.08 (-0.11 to -0.06) | -1.15; -0.12 (-0.14 to -0.11) | -1.18; -0.16 (-0.17 to -0.15) |
+| 7 | `name_email_similarity` | +0.08; -0.06 (-0.09 to -0.05) | -1.63; -0.08 (-0.11 to -0.04) | -1.15; -0.00 (-0.04 to +0.01) | -1.18; +0.15 (+0.12 to +0.16) |
+| 8 | `current_address_months_count` | +0.08; -0.11 (-0.12 to -0.08) | -1.63; -0.26 (-0.28 to -0.23) | -1.15; -0.17 (-0.23 to -0.14) | -1.18; -0.02 (-0.04 to -0.01) |
+| 9 | `keep_alive_session` | +0.08; -0.19 (-0.23 to -0.15) | -1.63; +0.03 (+0.00 to +0.04) | -1.15; -0.02 (-0.05 to +0.02) | -1.18; +0.17 (+0.11 to +0.23) |
+| 10 | `prev_address_months_count` | +0.08; -0.18 (-0.19 to -0.17) | -1.63; -0.34 (-0.37 to -0.31) | -1.15; -0.32 (-0.34 to -0.30) | -1.18; -0.17 (-0.18 to -0.13) |
+
+The other variants are in results_posthoc/mechanism_features.csv. Across all variants, features and months 5 to 7, the mean shrink is positive in 43 of 180 cells and every draw shrinks the miss in 30; the largest mean shrink is 0.48 points (`phone_home_valid`, Variant I, month 5) against main-study static misses of 0.87 to 2.32 points in months 5 to 7. Replacing `credit_risk_score`, the feature with the largest population stability index in the main study, changes the miss by -0.16 to +0.00 points, and replacing `housing_status` widens it by 0.41 to 0.63 points on average per variant.
+
+Reading. This is a null result for single features: no one feature among the top 10, replaced on its own, accounts for the negatives' score drift. One-at-a-time replacement breaks the joint distribution of the features, so it can widen the miss (as for `housing_status`), and drift spread over several features or carried by their joint distribution would not show up here. It also qualifies the main RESULTS.md sentence that the `credit_risk_score` drift is "consistent with" the static misses: that feature's drift, replaced alone, does not explain them.

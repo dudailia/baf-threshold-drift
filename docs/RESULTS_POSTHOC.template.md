@@ -19,3 +19,31 @@ Split B.
 With the threshold set on month 4, static is under budget in months 5 to 7 by {{value:rolling/B/static/miss_m567/max|apt2}} to {{value:rolling/B/static/miss_m567/min|apt2}} points, with {{value:rolling/B/static/ci_m567_below_zero|int}} of {{value:rolling/B/static/ci_m567_n|int}} seed 0 intervals entirely below zero, as in the main study.
 
 Reading. The main study's static under-spend in months 5 to 7 holds when the threshold is set on month 3 (main study) or month 4 (split B), but reverses into an over-spend when it is set on month 2 (split A). What holds on every split is that a threshold set once misses the budget in later months, by {{value:rolling/A/static/miss_all/min|apt2}} to {{value:rolling/A/static/miss_all/max|apt2}} points on split A and {{value:rolling/B/static/miss_m567/max|apt2}} to {{value:rolling/B/static/miss_m567/min|apt2}} on split B; the sign is consistent with whether the validation month's negatives score higher or lower than the later months' (section 2). This contradicts the main study's wording that static "under-spends", which is true only for validation months 3 and 4. Label-free top 5% stays {{value:rolling/A/label_free_top/miss_all/max|apt2}} to {{value:rolling/A/label_free_top/miss_all/min|apt2}} points under budget on split A and {{value:rolling/B/label_free_top/miss_all/max|apt2}} to {{value:rolling/B/label_free_top/miss_all/min|apt2}} on split B, and delayed-label lag 1 swings from {{value:rolling/B/delayed_lag1/miss_all/min|pt2}} to {{value:rolling/B/delayed_lag1/miss_all/max|pt2}} points on split B, as in the main study.
+
+## 2. Mechanism (exploratory)
+
+Main study, LightGBM seed 0. The model was refit because models were not saved; the refit reproduces the saved scores exactly (largest absolute difference {{value:mechanism/refit_max_abs_diff|f3}}).
+
+Where month 3's static threshold falls in each month's negative scores (the quantile equals 1 minus the realized FPR), and the Kolmogorov-Smirnov distance between month 3 negatives' scores and month t negatives' scores.
+
+{{table:mechanism_quantiles}}
+
+The negatives' score distributions differ from month 3's by KS distances of only {{value:mechanism/ks/min|f3}} to {{value:mechanism/ks/max|f3}}, yet the threshold's quantile moves from {{value:mechanism/quantile/min|f3}} to {{value:mechanism/quantile/max|f3}}: the drift that matters sits in the upper tail, and the KS distance tracks the miss only weakly (correlation {{value:mechanism/corr_ks_vs_miss|f2}} with the signed miss over the variant-months).
+
+Feature replacement. For each of the 10 features with the highest gain, the feature's values in month t negatives were replaced by draws from month 3 negatives of the same age group, and the static miss recomputed (five draws; "shrink" is the static absolute miss minus the absolute miss after replacement, so positive means the replacement moves the month toward budget).
+
+Base.
+
+{{table:mechanism_features|Base}}
+
+Variant IV.
+
+{{table:mechanism_features|Variant IV}}
+
+Variant V.
+
+{{table:mechanism_features|Variant V}}
+
+The other variants are in results_posthoc/mechanism_features.csv. Across all variants, features and months 5 to 7, the mean shrink is positive in {{value:mechanism/n_mean_shrink_positive_m567|int}} of {{value:mechanism/n_cells_m567|int}} cells and every draw shrinks the miss in {{value:mechanism/n_all_draws_shrink_m567|int}}; the largest mean shrink is {{value:mechanism/max_shrink_m567|apt2}} points (`{{value:mechanism/max_shrink_feature|str}}`, {{value:mechanism/max_shrink_variant|str}}, month {{value:mechanism/max_shrink_month|int}}) against main-study static misses of {{value:derived/static/miss_m567/max|apt2}} to {{value:derived/static/miss_m567/min|apt2}} points in months 5 to 7. Replacing `credit_risk_score`, the feature with the largest population stability index in the main study, changes the miss by {{value:mechanism/credit_risk_score/shrink_m567/min|pt2}} to {{value:mechanism/credit_risk_score/shrink_m567/max|pt2}} points, and replacing `housing_status` widens it by {{value:mechanism/housing_status/shrink_m567_by_variant/max|apt2}} to {{value:mechanism/housing_status/shrink_m567_by_variant/min|apt2}} points on average per variant.
+
+Reading. This is a null result for single features: no one feature among the top 10, replaced on its own, accounts for the negatives' score drift. One-at-a-time replacement breaks the joint distribution of the features, so it can widen the miss (as for `housing_status`), and drift spread over several features or carried by their joint distribution would not show up here. It also qualifies the main RESULTS.md sentence that the `credit_risk_score` drift is "consistent with" the static misses: that feature's drift, replaced alone, does not explain them.
