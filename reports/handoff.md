@@ -47,12 +47,14 @@ Everything here is post hoc (PROTOCOL.md, "Post hoc analyses"). Outputs: results
 | Task | Status | Code | Outputs |
 |---|---|---|---|
 | setup | done (25e8629) | PROTOCOL.md section, reports/decisions.md | |
-| 1 rolling-origin | running in background (log results_posthoc/logs/task1.out) | src/posthoc/rolling.py | rolling_*.csv |
+| 1 rolling-origin | done | src/posthoc/rolling.py | rolling_*.csv. Split A (validate on month 2): static OVER budget in all 18 cells of months 5-7 (CI above 0), contradicting the main under-spend; split B (validate on month 4): under budget in 18 of 18, as in the main study. |
 | 2 mechanism | queued after task 1 | src/posthoc/mechanism.py | mechanism_*.csv |
 | 3 hyperparameters | queued | src/posthoc/hyper.py | hyper_*.csv |
 | 4 retraining | queued | src/posthoc/retrain.py | retrain_*.csv |
 | 5 isotonic | queued | src/posthoc/isotonic.py | isotonic_*.csv |
 | 6 call prep | to do | docs/call_questions.template.md | prep/call_questions.md |
 | 7 independent check | to do | fresh subagent | results_posthoc/independent_check.csv |
+
+Post hoc findings that contradict the main study so far: the sign of the static miss depends on the validation month (task 1, split A).
 
 Hard stops fired so far: none.
