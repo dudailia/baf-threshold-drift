@@ -97,10 +97,11 @@ N_MONTHS = 4
 SEED = 20261016
 ON_BUDGET_PT = 0.25  # |budget miss| below this many FPR points counts as on budget
 
-ROOT = __import__("pathlib").Path(__file__).resolve().parent.parent
-CSV = ROOT / "results" / "synthetic" / "mechanism.csv"
-REPORT = ROOT / "reports" / "mechanism.md"
-FIGURE = ROOT / "figures" / "synthetic_mechanism.png"
+from src.config import FIGURES, REPORTS, RESULTS  # noqa: E402
+
+CSV = RESULTS / "synthetic" / "mechanism.csv"
+REPORT = REPORTS / "mechanism.md"
+FIGURE = FIGURES / "synthetic_mechanism.png"
 
 
 def run_all():

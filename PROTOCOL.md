@@ -173,6 +173,21 @@ Declared on 2026-10-16, before any data file was opened and before any model was
 
 Strategies (v) and (vi) use the protected attribute (age group, primary definition) at decision time. They are reported as diagnostics of where the FPR gap comes from, not as recommendations, and every table or sentence that shows them says so.
 
+## Implementation decisions
+
+Declared 2026-10-16, after the code was tested on synthetic data and before any real data file was opened.
+
+| Item | Status | Decision |
+|---|---|---|
+| Tuning configurations | my choice | The same 20 configurations (sampled once, seed 2022) are tried on every variant; the one with the highest validation-month TPR at 5% FPR is kept (ties go to the earlier trial). |
+| Replication statistic | my choice | The same 20 configurations, seed 0, trained on months 0 to 5 of Base. Compared with Figure 1 is the mean TPR of the 5 configurations with the highest test TPR, which is how Figure 1 highlights its top 5. Within the loose bound means within 0.05 of 0.55. The with-month run is the replication; the without-month run is reported next to it. |
+| Shuffled-label check | my choice | Labels permuted within months 0 to 2 (seed 0), Base, first sampled configuration. Passes if the oracle TPR at 5% FPR, pooled over months 4 to 7, is within 0.02 of 0.05 (about 7 binomial standard errors at the pooled positive count). |
+| PSI importance | my choice | In Stage F, Base only, a check model (first configuration, real labels, main split). After the full run, all variants, from the tuned seed 0 LightGBM gain importance. |
+| Oracle tripwire | my choice | Fires if any single-threshold strategy (static, label-free, delayed-label) has realized FPR within the target and TPR above the oracle's on the same month, model, seed and target, or if the oracle is over budget. This is impossible by construction, so it detects a bug. Group-wise strategies use a different decision rule and are excluded. |
+| Too-good tripwire | my choice | Fires if any oracle TPR at 5% FPR exceeds 0.9. |
+| Bootstrap scope | my choice | 1,000 paired resamples for the 5% target. Exploratory targets (1%, 2%, 10%) get point estimates and seed spread only. If the logistic regression seeds give identical scores (checked, not assumed), intervals are computed once, for seed 0. |
+| Percentile intervals | my choice | Percentile intervals with re-estimated thresholds need not contain the point estimate. The number of interval rows where this happens is recorded in results/manifest.json and reported. |
+
 ## Data files
 
 The loader does not assume file names. It lists every file in `data/raw/`, and the mapping from file name to variant is written explicitly in `src/` only after the actual Kaggle names have been seen. It stops if it does not find exactly six variant files.

@@ -26,6 +26,8 @@ LABELS = {
     "delayed_lag2": "Delayed-label, lag 2",
     "delayed_lag3": "Delayed-label, lag 3",
     "oracle": "Oracle (upper bound, not deployable)",
+    "groupwise_static": "Group-wise static (exploratory diagnostic, uses age)",
+    "groupwise_label_free": "Group-wise label-free (exploratory diagnostic, uses age)",
 }
 
 STYLE = {

@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.metrics import roc_curve
 
 from src.metrics import confusion, rates
-from src.plotstyle import LABELS, MUTED, STYLE, setup
+from src.plotstyle import INK_2, LABELS, MUTED, STYLE, setup
 
 
 def plot_roc_operating_points(curves, points, path, max_fpr=0.15, title=None):
@@ -36,9 +36,12 @@ def plot_roc_operating_points(curves, points, path, max_fpr=0.15, title=None):
                 r = rates(confusion(scores, labels, t))
                 coords[(v, m, strategy)] = (r["fpr"], r["tpr"])
                 style = STYLE.get(strategy, dict(color=MUTED, marker="o"))
-                ax.plot(r["fpr"], r["tpr"], linestyle="none", marker=style["marker"], color=style["color"],
-                        markersize=8, markeredgecolor="#fcfcfb", markeredgewidth=1, label=LABELS.get(strategy, strategy))
-            ax.set_xlim(0, max_fpr)
+                color = INK_2 if strategy == "oracle" else style["color"]
+                # Hollow markers so that strategies sitting on the same point stay visible.
+                ax.plot(r["fpr"], r["tpr"], linestyle="none", marker=style["marker"], markerfacecolor="none",
+                        markeredgecolor=color, markeredgewidth=1.6, markersize=9, label=LABELS.get(strategy, strategy))
+            panel_points = [xy[0] for (v, m, _), xy in coords.items() if (v, m) == (variant, month)]
+            ax.set_xlim(0, max([max_fpr] + [1.1 * x for x in panel_points]))
             ax.set_title(f"{variant}, month {month}", fontsize=9)
             if i == len(variants) - 1:
                 ax.set_xlabel("FPR")

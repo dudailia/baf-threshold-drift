@@ -21,11 +21,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent.parent
-RESULTS = ROOT / "results"
+from src.config import DOCS as DOCS_DIR
+from src.config import OUT, RESULTS, ROOT
+
 DOCS = {
-    ROOT / "docs" / "RESULTS.template.md": ROOT / "RESULTS.md",
-    ROOT / "docs" / "one_pager.template.md": ROOT / "reports" / "one_pager.md",
+    DOCS_DIR / "RESULTS.template.md": OUT / "RESULTS.md",
+    DOCS_DIR / "README.template.md": OUT / "README.md",
+    DOCS_DIR / "one_pager.template.md": OUT / "reports" / "one_pager.md",
 }
 
 
@@ -182,7 +184,7 @@ def main(argv):
         elif not out.exists() or out.read_text() != fresh:
             raise CheckError(f"{out} differs from a fresh render of {template}; edit the template, not the output")
         check_document(out, pool)
-        print(f"{cmd}: {out.relative_to(ROOT)} ok")
+        print(f"{cmd}: {out} ok")
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-RAW_DIR = Path(__file__).resolve().parent.parent / "data" / "raw"
+from src.config import RAW_DIR
 
 LABEL = "fraud_bool"
 
@@ -67,8 +67,15 @@ NEGATIVE_MISSING = ["intended_balcon_amount"]
 MAIN_SPLIT = dict(train=[0, 1, 2], validation=[3], test=[4, 5, 6, 7])
 PAPER_SPLIT = dict(train=[0, 1, 2, 3, 4, 5], test=[6, 7])
 
-# Filled in only after the actual files in data/raw/ have been listed.
-VARIANT_FILES: dict[str, str] = {}
+# Names as listed in data/raw/ on 2026-10-16 (reports/progress.md), not assumed.
+VARIANT_FILES = {
+    "Base": "Base.csv",
+    "Variant I": "Variant I.csv",
+    "Variant II": "Variant II.csv",
+    "Variant III": "Variant III.csv",
+    "Variant IV": "Variant IV.csv",
+    "Variant V": "Variant V.csv",
+}
 
 
 def list_raw_files(raw_dir=RAW_DIR):
