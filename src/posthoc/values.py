@@ -46,6 +46,17 @@ def build():
         _hyper(R("hyper_summary"), R("hyper_paired"), d)
     if have("retrain_summary", "retrain_paired"):
         _retrain(R("retrain_summary"), R("retrain_paired"), d)
+        main_sum = pd.read_csv(config_root() / "results" / "summary.csv")
+        ms = main_sum[(main_sum.model == "lightgbm") & np.isclose(main_sum.fpr_target, 0.05) & (main_sum.age_def == ">=50")
+                      & (main_sum.strategy == "delayed_lag1")].pivot_table(index=["variant", "month"], columns="metric", values="mean")
+        rs = R("retrain_summary").pivot_table(index=["variant", "month"], columns="metric", values="mean")
+        j = rs.join(ms, rsuffix="_lag1", how="inner")
+        dfpr = j["realized_fpr"] - j["realized_fpr_lag1"]
+        dtpr = j["tpr"] - j["tpr_lag1"]
+        d["retrain/vs_lag1/n_higher_fpr"] = int((dfpr > 0).sum())
+        d["retrain/vs_lag1/n"] = int(len(j))
+        d["retrain/vs_lag1/corr_tpr_gain_fpr_gain"] = float(np.corrcoef(dtpr, dfpr)[0, 1])
+        _range(dfpr, "retrain/vs_lag1/fpr_diff", d)
     if have("isotonic_summary", "isotonic_paired"):
         _isotonic(R("isotonic_summary"), R("isotonic_paired"), d)
     if have("valmonth_summary", "valmonth_ci"):

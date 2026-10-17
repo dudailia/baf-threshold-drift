@@ -148,6 +148,7 @@ FORMATS = {
     "f2": lambda v: f"{v:.2f}",
     "f3": lambda v: f"{v:.3f}",
     "f4": lambda v: f"{v:.4f}",
+    "f5": lambda v: f"{v:.5f}",
     "int": lambda v: f"{int(round(v)):,}",
     "str": str,
 }
