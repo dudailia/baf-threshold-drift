@@ -81,3 +81,16 @@ Queue finished. Next step: the user's review of RESULTS_POSTHOC.md section 7 and
 | 2 fresh-clone test | done | clean clone + new venv: make test (103 passed), make audit, make sample all pass; audit outputs byte-identical; nothing missing from git |
 | 3 second claims audit | done | 175 claims: 13 unsupported, all fixed (velocity_4w replacement does reduce the miss in some cells; two rounded bounds; retraining TPR gain mostly bought by higher FPR; calibration gain inconclusive; hyper range excluded rank 1; banned word in a heading; stray lines in call prep) |
 | 4 limits, data origin, interval widths | done | Kaggle description and datasheet A6, A14 quoted; static CI widths 0.23 to 0.32 pt next to the 0.87 to 2.32 pt range; one-pager about one page |
+
+## Release queue (2026-10-17, evening)
+
+| Step | Status | Notes |
+|---|---|---|
+| 1 datasheet check | done | datasheet re-downloaded (same file, SHA-256 prefix 367846738d63ed35); A6 (p1), A14 (p4), A17 (p5) quotes match verbatim; only page numbers added |
+| 2 deviations | done | reports/deviations.md, 33 items with reasons and commits |
+| 3 REVIEWING.md | done | repo root, about 400 words |
+| 4 README and LICENSE | done | headline and caveat first; exact data file names; MIT LICENSE |
+| 5 one-pager PDF | done | reports/one_pager.pdf, one letter page, `make pdf` |
+| 6 make check, make test, tag | done | tag v1.0-for-review on the final commit; not pushed |
+
+State: final. Tag v1.0-for-review marks the version for review. Nothing pushed; history not rewritten.
