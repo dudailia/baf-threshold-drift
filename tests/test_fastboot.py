@@ -154,3 +154,17 @@ def test_shifted_validation_month_matches_simple_functions():
         assert r["tpr"] == pytest.approx(flag(s[y == 1], t).mean(), abs=1e-12)
     na = {(r["strategy"], r["month"]) for r in point if not r["available"]}
     assert na == {("delayed_lag2", 3), ("delayed_lag3", 3), ("delayed_lag3", 4)}
+
+
+def test_non_consecutive_months_mark_missing_delayed_sources_unavailable():
+    """Post hoc analysis 6 evaluates a threshold month and a later month only (e.g. months 3 and 5)."""
+    rng = np.random.default_rng(7)
+    months = {3: _month(rng, 1500), 5: _month(rng, 1500)}
+    point, _ = evaluate_months(months, [0.05], primary_age=">=50", n_boot=0, validation_month=3)
+    by = {(r["strategy"], r["month"]): r for r in point if r["age_def"] == ">=50"}
+    assert not by[("delayed_lag1", 5)]["available"]  # source month 4 is not present
+    assert by[("delayed_lag2", 5)]["available"]       # source month 3 is present
+    s3, y3, _ = months[3]
+    s5, y5, _ = months[5]
+    t = threshold_at_fpr(s3, y3, 0.05)
+    assert by[("static", 5)]["realized_fpr"] == pytest.approx(flag(s5[y5 == 0], t).mean(), abs=1e-12)

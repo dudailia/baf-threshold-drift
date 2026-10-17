@@ -161,7 +161,7 @@ def _evaluate_pass(data, W, targets, primary_age, validation_month=VALIDATION_MO
             plans["label_free_val_rate"] = (j, md.threshold_from_cut(j), m)
             for k in LAGS:
                 src = m - k
-                if src >= validation_month:
+                if src >= validation_month and src in data:  # source month must be among the evaluated months
                     t = oracle_t[(src, f)]
                     plans[f"delayed_lag{k}"] = (md.count_at_or_above(t), t, src)
                 else:
