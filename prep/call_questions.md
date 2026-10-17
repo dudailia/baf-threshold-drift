@@ -8,7 +8,7 @@ A strong answer says that the paper's operating point is the oracle here, on poo
 
 ## 2. Your shuffled-label check failed. Why trust any number?
 
-It must concede the failure plainly: pooled TPR 0.117 against the declared 0.05 plus or minus 0.02, with the criterion not redefined. Then the evidence against a leak: 20 shuffles give a LightGBM median of 0.059 (the original was the maximum) and a logistic regression range of 0.026 to 0.069; a label-free density score alone reaches 0.083; the leak audit flags 0 features; a unit test confirms that every fit uses training months only; and an independent recomputation matched every stored metric. The honest conclusion is that the declared null was wrong (fraud applications are atypical), not that the check passed.
+It must concede the failure plainly: pooled TPR 0.117 against the declared 0.05 plus or minus 0.02, with the criterion not redefined. Then the evidence against a leak: 20 shuffles give a LightGBM median of 0.059 (the original was the maximum) and a logistic regression range of 0.026 to 0.069; a label-free density score alone reaches 0.083; the leak audit flags 0 features; a unit test confirms that every fit uses training months only; and an independent recomputation matched every stored metric. The honest conclusion is that a wrong null (fraud applications are atypical) is one possible explanation, not established, since the median shuffle was inside the tolerance; the check did not pass.
 
 ## 3. Is the static under-spend real, or an artefact of month 3?
 
@@ -32,7 +32,7 @@ Across global-threshold strategies the ratio differs by at most 0.094 within a v
 
 ## 8. Variant IV removes the prevalence disparity after month 5, yet the FPR ratio stays far below 1. Why?
 
-The model was trained only on months with the disparity and has `customer_age` as a feature, so it keeps scoring older applicants higher; the ratio stays between 0.081 and 0.125, and the older group gets about 89% of label-free alerts at 51% of applications. A strong answer also says what was not tested: dropping age as a feature, and retraining on post-change months for fairness.
+The model was trained only on months with the disparity and has `customer_age` as a feature, and one possible reading, not tested here, is that it keeps scoring older applicants higher for that reason; the ratio stays between 0.081 and 0.125, and the older group gets about 89% of label-free alerts at 51% of applications. A strong answer also says what was not tested: dropping age as a feature, and retraining on post-change months for fairness.
 
 ## 9. Delayed labels: with a realistic lag, or with retraining, would the conclusions change?
 

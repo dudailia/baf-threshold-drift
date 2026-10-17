@@ -52,6 +52,17 @@ def build():
         _valmonth(R("valmonth_summary"), R("valmonth_ci"), d)
     if have("fixedq_summary", "fixedq_paired", "isotonic_summary"):
         _fixedq(R("fixedq_summary"), R("fixedq_paired"), R("isotonic_summary"), d)
+    psi_path = config_root() / "results" / "psi.csv"
+    if psi_path.exists():
+        ps = pd.read_csv(psi_path)
+        cols = [f"psi_month_{m}" for m in range(3, 8)]
+        top = {v: {g.loc[g[c].idxmax(), "feature"] for c in cols} for v, g in ps.groupby("variant")}
+        for feat in ("velocity_4w", "credit_risk_score"):
+            vs = [v for v, fs in top.items() if fs == {feat}]
+            d[f"psi/{feat}/n_variants_largest"] = len(vs)
+            x = ps[ps.variant.isin(vs) & (ps.feature == feat)][cols].to_numpy()
+            if x.size:
+                _range(x.ravel(), f"psi/{feat}/largest_variants_m3to7", d)
     main_ic = config_root() / "results" / "independent_check.csv"
     if main_ic.exists():
         m = pd.read_csv(main_ic)
@@ -59,6 +70,8 @@ def build():
         d["main/independent/width_ratio_median"] = float(r.median_ratio)
         d["main/independent/width_ratio_min"] = float(r.min_ratio)
         d["main/independent/width_ratio_max"] = float(r.max_ratio)
+        sens = m[m.check.str.startswith("threshold at lowest")].iloc[0]
+        d["check/independent/n_rows_differing"] = int(sens.rows_differing)
     if have("independent_check"):
         ic = R("independent_check")
         d["independent/max_abs_diff"] = float(ic["max_abs_diff"].max())
@@ -118,6 +131,10 @@ def _mechanism(q, f, rc, d):
     if len(ph):
         _range(ph, "mechanism/phone_home_valid/shrink_m567_by_variant", d)
         d["mechanism/phone_home_valid/n_variants_in_top10"] = int(len(ph))
+    vel = f[f.month.isin(LATE) & (f.feature == "velocity_4w")]
+    if len(vel):
+        _range(vel.shrink_mean, "mechanism/velocity_4w/shrink_m567", d)
+        d["mechanism/velocity_4w/n_variants"] = int(vel.variant.nunique())
     cr = f[f.month.isin(LATE) & (f.feature == "credit_risk_score")]
     if len(cr):
         _range(cr.shrink_mean, "mechanism/credit_risk_score/shrink_m567", d)
