@@ -1,0 +1,16 @@
+predictions_commit,prediction,result,detail
+0be4b0ddf844b12493d29d3585329fa792f203ab,1,miss,"largest TPR gap among the deployable three: 10.10 pt (Variant II, month 6); 3 of 16 variant-months within 4 pt"
+0be4b0ddf844b12493d29d3585329fa792f203ab,2 (static FPR),miss,static realized FPR ranged 2.68% to 5.67%; 7 of 16 within 4% to 6%
+0be4b0ddf844b12493d29d3585329fa792f203ab,2 (label-free FPR),miss,label-free realized FPR ranged 3.95% to 4.48%; 14 of 16 within 4.2% to 4.8%
+0be4b0ddf844b12493d29d3585329fa792f203ab,3,hit,"static realized FPR, months 4-5 mean 4.04%, months 6-7 mean 3.56%, difference -0.48 pt"
+0be4b0ddf844b12493d29d3585329fa792f203ab,4,miss,"month 6: largest static (-1.27 pt), smallest label_free_top (-0.42 pt), label-free -0.42 pt; month 7: largest static (-1.62 pt), smallest label_free_top (-0.33 pt), label-free -0.33 pt"
+0be4b0ddf844b12493d29d3585329fa792f203ab,5,miss,"month 6: highest TPR delayed_lag1 (44.4%, realized FPR 6.02%; highest realized FPR is delayed_lag1); month 7: highest TPR label_free_top (40.4%, realized FPR 4.67%; highest realized FPR is label_free_top)"
+0be4b0ddf844b12493d29d3585329fa792f203ab,6,hit,"static FPR ratio, months 4-5 mean 0.089, months 6-7 mean 0.088, change -0.001"
+0be4b0ddf844b12493d29d3585329fa792f203ab,7,hit,month 6: FPR ratio label-free 0.104 vs static 0.089; higher-fraud-rate group old (1.24% vs 1.21%) gets 89.4% of label-free alerts; month 7: FPR ratio label-free 0.108 vs static 0.087; higher-fraud-rate group old (0.95% vs 0.91%) gets 89.3% of label-free alerts
+0be4b0ddf844b12493d29d3585329fa792f203ab,A,miss,"TPR loss from months 4-5 to 6-7: static +14.1 pt, label_free_top +11.6 pt, label_free_val_rate +12.2 pt, delayed_lag1 +6.2 pt, oracle +12.9 pt; largest gap between strategies in any test month 13.3 pt"
+0be4b0ddf844b12493d29d3585329fa792f203ab,8,hit,"static realized FPR, months 4-5 mean 4.26%, months 6-7 mean 3.87%, difference -0.39 pt"
+0be4b0ddf844b12493d29d3585329fa792f203ab,9,miss,"month 6: largest static (-1.12 pt), smallest label_free_top (-0.35 pt), label-free -0.35 pt; month 7: largest static (-1.14 pt), smallest delayed_lag1 (+0.01 pt), label-free -0.26 pt"
+0be4b0ddf844b12493d29d3585329fa792f203ab,10,hit,"month 6: highest TPR delayed_lag1 (36.2%, realized FPR 5.64%; highest realized FPR is delayed_lag1); month 7: highest TPR delayed_lag1 (33.0%, realized FPR 5.01%; highest realized FPR is delayed_lag1)"
+0be4b0ddf844b12493d29d3585329fa792f203ab,11,hit,"static FPR ratio, months 4-5 mean 0.238, months 6-7 mean 0.261, change +0.023"
+0be4b0ddf844b12493d29d3585329fa792f203ab,12,miss,month 6: FPR ratio label-free 0.243 vs static 0.259; higher-fraud-rate group old (1.24% vs 1.21%) gets 81.4% of label-free alerts; month 7: FPR ratio label-free 0.247 vs static 0.263; higher-fraud-rate group young (0.93% vs 0.93%) gets 19.1% of label-free alerts
+0be4b0ddf844b12493d29d3585329fa792f203ab,B,hit,"TPR loss from months 4-5 to 6-7: static +42.5 pt, label_free_top +39.5 pt, label_free_val_rate +39.7 pt, delayed_lag1 +37.8 pt, oracle +41.5 pt; largest gap between strategies in any test month 6.6 pt"

@@ -38,12 +38,12 @@ def _variants(summary):
     return [v for v in VARIANTS if v in set(summary.variant)]
 
 
-def by_month(summary, ci, metric, ylabel, path, target_line=False, title=""):
+def by_month(summary, ci, metric, ylabel, path, target_line=False, title="", scale=100):
     plt = setup()
     vs = _variants(summary)
     fig, axes = plt.subplots(1, len(vs), figsize=(3.1 * len(vs), 3.2), sharey=True, squeeze=False)
     for ax, v in zip(axes[0], vs):
-        _panel(ax, summary, ci, v, metric)
+        _panel(ax, summary, ci, v, metric, scale=scale)
         if target_line:
             ax.axhline(100 * PRIMARY_TARGET, color="#52514e", linewidth=0.8, linestyle=":")
         ax.set_title(v, fontsize=9)
@@ -100,7 +100,7 @@ def main():
     by_month(summary, ci, "realized_fpr", "realized FPR, %", config.FIGURES / "realized_fpr_by_month.png", True, f"Realized FPR by test month {note}")
     tpr_with_fpr(summary, ci, config.FIGURES / "tpr_by_month.png")
     by_month(summary, ci, "fpr_ratio", "FPR ratio (lowest / highest)", config.FIGURES / "fpr_ratio_by_month.png", False,
-             "Age-group FPR ratio by test month (LightGBM, seed mean; bars: seed 0 bootstrap 95% CI)")
+             "Age-group FPR ratio by test month (LightGBM, seed mean; bars: seed 0 bootstrap 95% CI)", scale=1)
     roc_points(metrics, config.FIGURES / "roc_operating_points.png")
     print(f"wrote figures to {config.FIGURES}")
 
