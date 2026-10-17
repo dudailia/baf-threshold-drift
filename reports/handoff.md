@@ -68,7 +68,7 @@ Queue finished. Next step: the user's review of RESULTS_POSTHOC.md section 7 and
 | 1 amendment | done | originals quoted in the amendment; git history at 125042c |
 | 2 validation month (post hoc 6) | done | RESULTS_POSTHOC.md section 8: with the model fixed, the sign depends on the threshold month in 9 of 18 cells; month 5 thresholds over-spend |
 | 3 isotonic control (post hoc 7) | done | RESULTS_POSTHOC.md section 7: fixed top 5.75% within 0.5 pt in 24 of 24; most of the isotonic result is the FPR identity |
-| 4 clean rebuild | to do, after text is final | make clean, make all |
+| 4 clean rebuild | done | make clean then make all: exit 0, 3,656 s; every result byte-identical; only a timestamp, a key order and fit times differed (reports/reproducibility.md) |
 | 5 claims audit | done | fresh subagent audited 111 claims (90 supported, 21 unsupported; 94 numbers spot-checked, 90 matched). Fixed: PSI claim (velocity_4w is the largest PSI feature in Base, II, III, IV; credit_risk_score only in I, V), TPR sensitivity stated as 0.0014 not 0.001, 'raise' for group-wise thresholds, 'only the positives' scores change', 'retraining was not studied', 'wrong null' stated as established, plus independence, causal and over-general wording. No number changed. |
 | 6 one-pager | done | rewritten from docs/one_pager.template.md; question, setup, three findings, limits; states one base, single validation split, arithmetic label-free results, amended claim |
 | 7 hygiene | done | reports/hygiene.md: personal email in commit metadata (all commits), absolute paths in the verbatim checker scripts; no credentials, IDs, phone numbers, data or other-project references |
