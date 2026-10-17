@@ -89,3 +89,35 @@ def commit():
 def write(df, name):
     OUT.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUT / f"{name}.csv", index=False)
+
+
+MAIN_STRATEGIES = ["static", "label_free_top", "label_free_val_rate", "delayed_lag1", "oracle"]
+
+
+def main_pred_path(variant, seed=0, model="lightgbm"):
+    return config.PREDICTIONS_DIR / variant / f"{model}_seed{seed}.npz"
+
+
+def main_boot(variant, n_boot):
+    """Main-study seed 0 LightGBM bootstrap arrays, recomputed in memory from saved predictions
+    with the main study's resample keys (identical draws), cached under results_posthoc/checkpoints/."""
+    path = CKPT / "main_boot" / f"{variant}.npz"
+    if path.exists():
+        z = np.load(path, allow_pickle=True)
+        return z["point"].item(), z["boot"].item()
+    pt, bt = evaluate(load_months(main_pred_path(variant)), variant, 3, MAIN_STRATEGIES, n_boot)
+    point = {(r["strategy"], r["month"]): r for r in pt}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez(path, point=np.array(point, dtype=object), boot=np.array(bt, dtype=object))
+    return point, bt
+
+
+def paired(a_point, a_arr, c_point, c_arr, metric, base):
+    """Paired difference a - c with the PROTOCOL.md verdict (same resampled rows for both)."""
+    from src.trace import verdict
+
+    d = a_arr[metric] - c_arr[metric]
+    lo, hi = np.nanpercentile(d, [2.5, 97.5])
+    ma = tuple(np.nanpercentile(a_arr[metric], [2.5, 97.5]))
+    mc = tuple(np.nanpercentile(c_arr[metric], [2.5, 97.5]))
+    return {**base, "metric": metric, "diff": a_point[metric] - c_point[metric], "lo": lo, "hi": hi, "verdict": verdict((lo, hi), ma, mc)}
