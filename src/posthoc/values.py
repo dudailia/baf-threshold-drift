@@ -85,6 +85,22 @@ def _mechanism(q, f, rc, d):
         d[f"mechanism/{v}/second_feature"] = str(by.index[1])
         d[f"mechanism/{v}/second_feature_shrink_m567_mean"] = float(by.iloc[1])
         d[f"mechanism/{v}/static_absmiss_m567_mean"] = float(g.groupby("month").static_miss.first().abs().mean())
+    lf = f[f.month.isin(LATE)]
+    d["mechanism/n_cells_m567"] = int(len(lf))
+    d["mechanism/n_all_draws_shrink_m567"] = int((lf.shrink_min > 0).sum())
+    d["mechanism/n_mean_shrink_positive_m567"] = int((lf.shrink_mean > 0).sum())
+    best = lf.loc[lf.shrink_mean.idxmax()]
+    d["mechanism/max_shrink_m567"], d["mechanism/max_shrink_feature"] = float(best.shrink_mean), str(best.feature)
+    d["mechanism/max_shrink_variant"], d["mechanism/max_shrink_month"] = str(best.variant), int(best.month)
+    worst = lf.loc[lf.shrink_mean.idxmin()]
+    d["mechanism/min_shrink_m567"], d["mechanism/min_shrink_feature"] = float(worst.shrink_mean), str(worst.feature)
+    hs = lf[lf.feature == "housing_status"].groupby("variant").shrink_mean.mean()
+    if len(hs):
+        _range(hs, "mechanism/housing_status/shrink_m567_by_variant", d)
+    ph = lf[lf.feature == "phone_home_valid"].groupby("variant").shrink_mean.mean()
+    if len(ph):
+        _range(ph, "mechanism/phone_home_valid/shrink_m567_by_variant", d)
+        d["mechanism/phone_home_valid/n_variants_in_top10"] = int(len(ph))
     cr = f[f.month.isin(LATE) & (f.feature == "credit_risk_score")]
     if len(cr):
         _range(cr.shrink_mean, "mechanism/credit_risk_score/shrink_m567", d)

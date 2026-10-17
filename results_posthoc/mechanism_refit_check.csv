@@ -1,0 +1,7 @@
+predictions_commit,main_results_commit,variant,max_abs_diff_refit_vs_saved
+0be4b0ddf844b12493d29d3585329fa792f203ab,125042c,Base,0.0
+0be4b0ddf844b12493d29d3585329fa792f203ab,125042c,Variant I,0.0
+0be4b0ddf844b12493d29d3585329fa792f203ab,125042c,Variant II,0.0
+0be4b0ddf844b12493d29d3585329fa792f203ab,125042c,Variant III,0.0
+0be4b0ddf844b12493d29d3585329fa792f203ab,125042c,Variant IV,0.0
+0be4b0ddf844b12493d29d3585329fa792f203ab,125042c,Variant V,0.0
