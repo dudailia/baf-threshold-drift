@@ -188,6 +188,22 @@ Declared 2026-10-16, after the code was tested on synthetic data and before any 
 | Bootstrap scope | my choice | 1,000 paired resamples for the 5% target. Exploratory targets (1%, 2%, 10%) get point estimates and seed spread only. If the logistic regression seeds give identical scores (checked, not assumed), intervals are computed once, for seed 0. |
 | Percentile intervals | my choice | Percentile intervals with re-estimated thresholds need not contain the point estimate. The number of interval rows where this happens is recorded in results/manifest.json and reported. |
 
+## Scoring rules for PREDICTIONS.md
+
+Declared 2026-10-16 while the replication check was running, before any main-study model was trained. Every rule uses LightGBM seed means (summary.csv), the 5% target and the primary age definition. "Deployable three" means static, label-free top 5% and delayed-label lag 1. "Label-free" means label-free top 5% (the primary version). Each line is scored hit or miss, with the numbers shown; bootstrap intervals are shown beside them but do not change the score.
+
+| Prediction | Rule |
+|---|---|
+| 1 | Base, I, II, III: in each of the 16 variant-months, the largest minus the smallest TPR among the deployable three is at most 4 points. Hit if all 16 hold. |
+| 2 (first part) | Base, I, II, III: static realized FPR between 4% and 6% in each of the 16 variant-months. |
+| 2 (second part) | Base, I, II, III: label-free realized FPR between 4.2% and 4.8% in each of the 16 variant-months. |
+| 3, 8 | Variant IV (3) or V (8): absolute difference between the mean static realized FPR over months 6 and 7 and over months 4 and 5 is below 0.5 points. |
+| 4, 9 | In each of months 6 and 7: among the deployable three, the largest absolute budget miss is label-free, with a signed miss between -1.0 and -0.5 points, and the smallest is static or delayed-label lag 1. Hit if both months hold. |
+| 5, 10 | In each of months 6 and 7: the highest TPR among the deployable three is static or delayed-label lag 1, and that strategy also has the highest realized FPR of the three. Hit if both months hold. |
+| 6, 11 | Absolute difference between the mean static FPR ratio over months 6 and 7 and over months 4 and 5 is below 0.05. |
+| 7, 12 | In each of months 6 and 7: the label-free FPR ratio is within 0.05 of the static FPR ratio, and the age group with the higher fraud rate in that month receives at least 65% of label-free alerts. Hit if both months hold. |
+| A, B | Variant IV (A) or V (B): for each of static, label-free top 5%, label-free validation alert rate, delayed-label lag 1 and the oracle, mean TPR over months 6 and 7 is below mean TPR over months 4 and 5, and every such loss exceeds the largest gap between strategies (largest minus smallest TPR among the same five) in any test month. |
+
 ## Data files
 
 The loader does not assume file names. It lists every file in `data/raw/`, and the mapping from file name to variant is written explicitly in `src/` only after the actual Kaggle names have been seen. It stops if it does not find exactly six variant files.
