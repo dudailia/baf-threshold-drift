@@ -52,9 +52,9 @@ Everything here is post hoc (PROTOCOL.md, "Post hoc analyses"). Outputs: results
 | 3 hyperparameters | done | src/posthoc/hyper.py | hyper_*.csv. Static miss in months 5-7 negative for every configuration (0 sign changes in 90 cells); size -0.35 to -2.16 pt; 3 sign changes in month 4 only. |
 | 4 retraining | done | src/posthoc/retrain.py | retrain_*.csv. Miss -1.97 to +1.76 pt (5 of 18 within 0.5 pt); validation-rate label-free smaller absolute miss in 13 of 18; TPR vs lag 1 -0.7 to +6.6 pt. |
 | 5 isotonic | done | src/posthoc/isotonic.py | isotonic_*.csv. Within 0.5 pt in 24 of 24 variant-months (miss -0.36 to +0.16); smaller absolute miss than top 5% in 24/24, than static in 19, vs validation rate 9 smaller / 9 larger / 6 inconclusive. |
-| 6 call prep | drafted, renders once tasks 3 and 4 values exist | docs/call_questions.template.md | prep/call_questions.md |
-| 7 independent check | brief drafted in the scratchpad (independent_check_posthoc_prompt.md); launch after task 5 | fresh subagent | results_posthoc/independent_check.csv |
+| 6 call prep | done | docs/call_questions.template.md | prep/call_questions.md (rendered and checked by src/trace.py) |
+| 7 independent check | running (fresh subagent) | brief in the scratchpad: independent_check_posthoc_prompt.md | results_posthoc/independent_check.csv |
 
-Post hoc findings that contradict the main study so far: the sign of the static miss depends on the validation month (task 1, split A); credit_risk_score drift alone does not explain the static miss (task 2), against the main RESULTS.md PSI sentence.
+Post hoc findings that contradict the main study so far: the sign of the static miss depends on the validation month (task 1, split A); credit_risk_score drift alone does not explain the static miss (task 2), against the main RESULTS.md PSI sentence. Not a contradiction but an extension: isotonic label-free targeting (task 5) holds the budget in 24 of 24 variant-months.
 
 Hard stops fired so far: none.

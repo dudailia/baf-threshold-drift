@@ -12,7 +12,7 @@ It must concede the failure plainly: pooled TPR {{value:check/shuffled/4-7 poole
 
 ## 3. Is the static under-spend real, or an artefact of month 3?
 
-This is the weakest main finding, and the answer must say so. On the main split the miss is {{value:derived/static/miss_m567/max|pt2}} to {{value:derived/static/miss_m567/min|pt2}} points in months 5 to 7, with all {{value:derived/static/ci_m567_n|int}} intervals below zero, and logistic regression agrees. Post hoc, a threshold set on month 4 also under-spends ({{value:rolling/B/static/ci_m567_below_zero|int}} of {{value:rolling/B/static/ci_m567_n|int}} intervals below zero), but one set on month 2 over-spends by {{value:rolling/A/static/miss_all/min|pt2}} to {{value:rolling/A/static/miss_all/max|pt2}} points. So "a threshold set once misses its budget by more than a point" holds on every split; "it under-spends" depends on the validation month.
+This is the weakest main finding, and the answer must say so. On the main split the miss is {{value:derived/static/miss_m567/max|pt2}} to {{value:derived/static/miss_m567/min|pt2}} points in months 5 to 7, with all {{value:derived/static/ci_m567_n|int}} intervals below zero, and logistic regression agrees. Post hoc, a threshold set on month 4 also under-spends ({{value:rolling/B/static/ci_m567_below_zero|int}} of {{value:rolling/B/static/ci_m567_n|int}} intervals below zero), but one set on month 2 over-spends by {{value:rolling/A/static/miss_all/min|pt2}} to {{value:rolling/A/static/miss_all/max|pt2}} points. So "a threshold set once misses its budget" holds on every split; "it under-spends" depends on the validation month. Post hoc, the sign in months 5 to 7 is stable across the five best tuning trials and a strongly regularised model ({{value:hyper/n_sign_change_m567|int}} sign changes in {{value:hyper/n_cells_m567|int}} cells), and no single top-10 feature, replaced by month 3 draws, explains the negatives' score drift.
 
 ## 4. Why make budget miss primary rather than TPR at 5% FPR?
 
@@ -20,7 +20,7 @@ Because every strategy thresholds the same scores of the same month, all operati
 
 ## 5. Label-free at the validation alert rate looks best. When does it fail?
 
-It assumes the fraud rate stays near the validation month's. It is within 0.5 points in {{value:derived/label_free_val_rate/absmiss_all/n_within_0.5pt|int}} of {{value:derived/label_free_val_rate/absmiss_all/n_cells|int}} variant-months but goes over budget, up to {{value:derived/label_free_val_rate/miss_all/max|pt2}} points, where the fraud rate falls below month 3's (Variants III to V), as the synthetic mechanism study predicts for a prevalence shift. Top 5% of applications is under budget everywhere for the arithmetic reason that frauds take part of the alerts.
+It assumes the fraud rate stays near the validation month's. It is within 0.5 points in {{value:derived/label_free_val_rate/absmiss_all/n_within_0.5pt|int}} of {{value:derived/label_free_val_rate/absmiss_all/n_cells|int}} variant-months but goes over budget, up to {{value:derived/label_free_val_rate/miss_all/max|pt2}} points, where the fraud rate falls below month 3's (Variants III to V), as the synthetic mechanism study predicts for a prevalence shift. Top 5% of applications is under budget everywhere for the arithmetic reason that frauds take part of the alerts. Post hoc and exploratory, estimating each month's FPR from isotonic-calibrated probabilities (fitted on month 3 only) stays within 0.5 points in {{value:isotonic/n_within_0.5pt|int}} of {{value:isotonic/n|int}} variant-months, which suggests the fix for the prevalence assumption, but it was chosen after seeing the results and needs a pre-registered test.
 
 ## 6. Do your intervals include threshold-estimation uncertainty, and are they too narrow?
 
@@ -36,7 +36,7 @@ The model was trained only on months with the disparity and has `customer_age` a
 
 ## 9. Delayed labels: with a realistic lag, or with retraining, would the conclusions change?
 
-Lag 1 swings from {{value:derived/delayed_lag1/miss_all/min|pt2}} to {{value:derived/delayed_lag1/miss_all/max|pt2}} points; lags 2 and 3 mostly stay under budget (RESULTS.md section 4). Post hoc, retraining on months 0 to t-2 with the threshold from month t-1 ranges from {{value:retrain/miss/min|pt2}} to {{value:retrain/miss/max|pt2}} points (RESULTS_POSTHOC.md section 4).
+Lag 1 swings from {{value:derived/delayed_lag1/miss_all/min|pt2}} to {{value:derived/delayed_lag1/miss_all/max|pt2}} points; lags 2 and 3 mostly stay under budget (RESULTS.md section 4). Post hoc, retraining on months 0 to t-2 with the threshold from month t-1 ranges from {{value:retrain/miss/min|pt2}} to {{value:retrain/miss/max|pt2}} points, within 0.5 points in only {{value:retrain/n_within_0.5pt|int}} of {{value:retrain/n|int}} variant-months, and has a larger absolute miss than label-free at the validation alert rate in {{value:retrain/vs/label_free_val_rate/n_differs_larger|int}} of {{value:retrain/vs/label_free_val_rate/n|int}}; it adds detection ({{value:retrain/tpr_minus_lag1/min|pt2}} to {{value:retrain/tpr_minus_lag1/max|pt2}} points of TPR over lag 1), not budget control (RESULTS_POSTHOC.md section 4).
 
 ## 10. Is the static miss a property of the tuned model, or would a different model drift differently?
 
