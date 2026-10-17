@@ -51,7 +51,7 @@ Everything here is post hoc (PROTOCOL.md, "Post hoc analyses"). Outputs: results
 | 2 mechanism | done | src/posthoc/mechanism.py | mechanism_*.csv. Refit exact. KS small; replacing any single top-10 feature with month-3 draws does not shrink the static miss except phone_home_valid slightly; credit_risk_score replacement does not shrink it (weakens a main RESULTS.md 'consistent with' sentence). |
 | 3 hyperparameters | done | src/posthoc/hyper.py | hyper_*.csv. Static miss in months 5-7 negative for every configuration (0 sign changes in 90 cells); size -0.35 to -2.16 pt; 3 sign changes in month 4 only. |
 | 4 retraining | done | src/posthoc/retrain.py | retrain_*.csv. Miss -1.97 to +1.76 pt (5 of 18 within 0.5 pt); validation-rate label-free smaller absolute miss in 13 of 18; TPR vs lag 1 -0.7 to +6.6 pt. |
-| 5 isotonic | running (log results_posthoc/logs/isotonic.log) | src/posthoc/isotonic.py | isotonic_*.csv |
+| 5 isotonic | done | src/posthoc/isotonic.py | isotonic_*.csv. Within 0.5 pt in 24 of 24 variant-months (miss -0.36 to +0.16); smaller absolute miss than top 5% in 24/24, than static in 19, vs validation rate 9 smaller / 9 larger / 6 inconclusive. |
 | 6 call prep | drafted, renders once tasks 3 and 4 values exist | docs/call_questions.template.md | prep/call_questions.md |
 | 7 independent check | brief drafted in the scratchpad (independent_check_posthoc_prompt.md); launch after task 5 | fresh subagent | results_posthoc/independent_check.csv |
 

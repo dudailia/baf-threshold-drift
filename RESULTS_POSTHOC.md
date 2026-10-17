@@ -285,3 +285,38 @@ For test months 5, 6 and 7: LightGBM trained on months 0 to t-2 with the main st
 The retrained threshold misses the budget by -1.97 to +1.76 points and is within 0.5 points in 5 of 18 variant-months. On absolute miss it is smaller than static in 10 variant-months and larger in 2 (6 inconclusive); against delayed-label lag 1, which takes its threshold from the same month, it is smaller in 6, larger in 5 and inconclusive in 7; against label-free at the validation alert rate it is smaller in 2 and larger in 13. Its TPR is -0.67 to +6.61 points from delayed-label lag 1's.
 
 Reading. Retraining with a threshold from the previous month does not keep the alert budget better than the label-free validation-rate strategy: it inherits the month-to-month swings of delayed-label lag 1. What it adds is detection, a few points of TPR over lag 1 at a similar budget miss, consistent with a model trained on more recent months. It does not recover Variant V's loss after month 5 (the training months still carry the injected bias).
+
+## 5. Probability-based label-free targeting (exploratory)
+
+Isotonic regression maps main-study LightGBM scores to fraud probability p, fitted on month 3 only. In each test month the threshold flags the largest set whose estimated FPR, the sum of (1 - p) over flagged applications divided by the sum over all applications, is at most 5%; no test-month labels are used. In the bootstrap, month 3 is resampled and the isotonic map refitted in each resample. Comparisons are paired on the same resampled rows (seed 0).
+
+| Variant | Month | Realized FPR %, seed mean (sd; min to max) | Budget miss pt, seed 0 [95% CI] | TPR %, seed mean | Absolute miss vs Label-free, top 5%: diff pt [paired CI], verdict | Absolute miss vs Label-free, validation alert rate: diff pt [paired CI], verdict | Absolute miss vs Static: diff pt [paired CI], verdict |
+|---|---|---|---|---|---|---|---|
+| Base | 4 | 4.90 (0.00; 4.89 to 4.90) | -0.10 [-0.15, -0.05] | 56.3 | -0.46 [-0.50, -0.43], differs | +0.01 [-0.01, +0.02], inconclusive | +0.05 [-0.14, +0.12], inconclusive |
+| Base | 5 | 4.78 (0.00; 4.77 to 4.79) | -0.21 [-0.26, -0.17] | 52.4 | -0.33 [-0.36, -0.31], differs | +0.14 [+0.12, +0.16], differs | -1.69 [-1.80, -1.57], differs |
+| Base | 6 | 4.82 (0.00; 4.81 to 4.82) | -0.19 [-0.24, -0.13] | 49.9 | -0.40 [-0.43, -0.37], differs | +0.07 [+0.05, +0.09], differs | -0.85 [-0.99, -0.71], differs |
+| Base | 7 | 4.64 (0.01; 4.63 to 4.65) | -0.37 [-0.42, -0.31] | 53.5 | -0.34 [-0.37, -0.31], differs | +0.13 [+0.11, +0.15], differs | -1.73 [-1.84, -1.61], differs |
+| Variant I | 4 | 4.98 (0.01; 4.97 to 4.98) | -0.02 [-0.07, +0.03] | 52.3 | -0.50 [-0.53, -0.46], differs | -0.03 [-0.05, +0.02], inconclusive | -0.63 [-0.80, -0.43], differs |
+| Variant I | 5 | 4.83 (0.01; 4.83 to 4.85) | -0.17 [-0.22, -0.13] | 51.1 | -0.36 [-0.39, -0.33], differs | +0.10 [+0.08, +0.12], differs | -1.31 [-1.45, -1.18], differs |
+| Variant I | 6 | 4.81 (0.01; 4.81 to 4.82) | -0.18 [-0.23, -0.13] | 50.0 | -0.41 [-0.44, -0.38], differs | +0.06 [+0.05, +0.08], differs | -0.70 [-0.86, -0.55], differs |
+| Variant I | 7 | 4.68 (0.01; 4.67 to 4.68) | -0.32 [-0.37, -0.26] | 52.7 | -0.37 [-0.40, -0.34], differs | +0.10 [+0.07, +0.12], differs | -1.27 [-1.41, -1.13], differs |
+| Variant II | 4 | 4.90 (0.01; 4.88 to 4.92) | -0.09 [-0.14, -0.04] | 53.3 | -0.44 [-0.47, -0.41], differs | +0.02 [+0.00, +0.04], inconclusive | +0.09 [-0.10, +0.11], inconclusive |
+| Variant II | 5 | 4.75 (0.01; 4.75 to 4.76) | -0.25 [-0.29, -0.20] | 53.4 | -0.32 [-0.34, -0.29], differs | +0.14 [+0.12, +0.16], differs | -1.79 [-1.91, -1.67], differs |
+| Variant II | 6 | 4.75 (0.01; 4.74 to 4.76) | -0.26 [-0.30, -0.20] | 52.6 | -0.37 [-0.41, -0.35], differs | +0.08 [+0.06, +0.10], differs | -1.00 [-1.15, -0.86], differs |
+| Variant II | 7 | 4.67 (0.01; 4.66 to 4.67) | -0.34 [-0.39, -0.29] | 53.5 | -0.37 [-0.40, -0.34], differs | +0.08 [+0.06, +0.10], differs | -1.33 [-1.48, -1.18], differs |
+| Variant III | 4 | 4.95 (0.01; 4.93 to 4.95) | -0.05 [-0.10, +0.01] | 74.6 | -1.01 [-1.06, -0.96], differs | -0.07 [-0.13, -0.02], inconclusive | -0.08 [-0.27, +0.06], inconclusive |
+| Variant III | 5 | 5.03 (0.01; 5.02 to 5.04) | +0.04 [+0.00, +0.08] | 76.3 | -0.59 [-0.66, -0.53], differs | -0.28 [-0.33, -0.23], differs | -1.69 [-1.83, -1.55], differs |
+| Variant III | 6 | 4.99 (0.01; 4.98 to 5.00) | +0.00 [-0.05, +0.05] | 75.8 | -0.85 [-0.88, -0.77], differs | -0.11 [-0.15, -0.00], differs | -0.89 [-1.02, -0.73], differs |
+| Variant III | 7 | 4.97 (0.01; 4.96 to 4.98) | -0.02 [-0.06, +0.02] | 73.3 | -0.61 [-0.64, -0.56], differs | -0.30 [-0.39, -0.20], differs | -2.29 [-2.38, -2.17], differs |
+| Variant IV | 4 | 4.92 (0.01; 4.91 to 4.92) | -0.08 [-0.14, -0.02] | 53.9 | -0.65 [-0.69, -0.61], differs | +0.01 [-0.01, +0.03], inconclusive | -0.00 [-0.20, +0.10], inconclusive |
+| Variant IV | 5 | 5.02 (0.00; 5.02 to 5.02) | +0.02 [-0.02, +0.06] | 54.1 | -0.42 [-0.46, -0.35], differs | -0.23 [-0.25, -0.17], differs | -1.97 [-2.08, -1.83], differs |
+| Variant IV | 6 | 5.09 (0.00; 5.09 to 5.10) | +0.09 [+0.05, +0.13] | 40.9 | -0.33 [-0.40, -0.26], differs | -0.16 [-0.19, -0.14], differs | -1.18 [-1.33, -1.02], differs |
+| Variant IV | 7 | 5.15 (0.01; 5.14 to 5.16) | +0.15 [+0.10, +0.20] | 42.4 | -0.18 [-0.25, -0.11], differs | -0.21 [-0.23, -0.18], differs | -1.46 [-1.61, -1.29], differs |
+| Variant V | 4 | 4.94 (0.01; 4.93 to 4.94) | -0.06 [-0.11, -0.00] | 74.8 | -1.00 [-1.05, -0.96], differs | -0.06 [-0.11, -0.01], inconclusive | -0.02 [-0.21, +0.08], inconclusive |
+| Variant V | 5 | 5.04 (0.00; 5.04 to 5.05) | +0.05 [+0.01, +0.08] | 75.2 | -0.58 [-0.64, -0.51], differs | -0.29 [-0.34, -0.25], differs | -1.58 [-1.72, -1.45], differs |
+| Variant V | 6 | 5.08 (0.00; 5.07 to 5.09) | +0.08 [+0.04, +0.12] | 34.5 | -0.27 [-0.34, -0.21], differs | -0.52 [-0.56, -0.48], differs | -1.08 [-1.22, -0.92], differs |
+| Variant V | 7 | 5.16 (0.02; 5.14 to 5.19) | +0.16 [+0.11, +0.20] | 33.4 | -0.10 [-0.17, -0.03], differs | -0.55 [-0.59, -0.51], differs | -1.03 [-1.20, -0.86], differs |
+
+Isotonic targeting is within 0.5 points of budget in 24 of 24 variant-months (miss -0.36 to +0.16 points). On absolute miss it is smaller than label-free top 5% in 24 of 24, smaller than static in 19 (larger in 0), smaller than delayed-label lag 1 in 17 (larger in 0), and against label-free at the validation alert rate smaller in 9, larger in 9 and inconclusive in 6.
+
+Reading. Estimating each month's FPR from calibrated probabilities removes most of the overshoot that the fixed validation alert rate shows where the fraud rate falls (Variants III to V), because it does not assume the fraud rate stays at month 3's; in Base, I and II, where the validation-rate strategy was already close, it is slightly further under budget. This is post hoc and exploratory, chosen after the main results were seen, on one dataset; it is a candidate for a pre-registered test, not a finding to rank above the main study's strategies.
