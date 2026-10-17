@@ -39,3 +39,20 @@ Last updated 2026-10-16, after Stage K (write-up); waiting for the user's review
 ## Next step
 
 Wait for the user's review of README.md, RESULTS.md and reports/one_pager.md. To change prose, edit docs/*.template.md and run `make tables check`; never edit the rendered files or PREDICTIONS.md.
+
+## Post hoc queue (overnight, started 2026-10-16 after commit 125042c)
+
+Everything here is post hoc (PROTOCOL.md, "Post hoc analyses"). Outputs: results_posthoc/ and RESULTS_POSTHOC.md (rendered from docs/RESULTS_POSTHOC.template.md by `python -m src.trace render`). Decisions: reports/decisions.md. Never touch results/, PREDICTIONS.md or the scoring rules (hard stops).
+
+| Task | Status | Code | Outputs |
+|---|---|---|---|
+| setup | done (25e8629) | PROTOCOL.md section, reports/decisions.md | |
+| 1 rolling-origin | running in background (log results_posthoc/logs/task1.out) | src/posthoc/rolling.py | rolling_*.csv |
+| 2 mechanism | queued after task 1 | src/posthoc/mechanism.py | mechanism_*.csv |
+| 3 hyperparameters | queued | src/posthoc/hyper.py | hyper_*.csv |
+| 4 retraining | queued | src/posthoc/retrain.py | retrain_*.csv |
+| 5 isotonic | queued | src/posthoc/isotonic.py | isotonic_*.csv |
+| 6 call prep | to do | docs/call_questions.template.md | prep/call_questions.md |
+| 7 independent check | to do | fresh subagent | results_posthoc/independent_check.csv |
+
+Hard stops fired so far: none.

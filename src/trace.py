@@ -85,13 +85,37 @@ class Pool:
         return i < self.sorted.size and self.sorted[i] <= x + tol
 
 
+def _dirs(results_dir):
+    """One results folder or a list of them; earlier folders take precedence on name clashes."""
+    return [Path(d) for d in (results_dir if isinstance(results_dir, (list, tuple)) else [results_dir])]
+
+
 def _manifest(results_dir):
-    path = Path(results_dir) / "manifest.json"
-    return json.loads(path.read_text()) if path.exists() else {}
+    out = {}
+    for d in reversed(_dirs(results_dir)):
+        path = d / "manifest.json"
+        if path.exists():
+            m = json.loads(path.read_text())
+            consts = out.get("text_constants", []) + m.get("text_constants", [])
+            out.update(m)
+            out["text_constants"] = consts
+    return out
+
+
+def _values(results_dir):
+    out = {}
+    for d in reversed(_dirs(results_dir)):
+        path = d / "values.json"
+        if path.exists():
+            out.update(json.loads(path.read_text()))
+    return out
 
 
 def load_results(results_dir=RESULTS):
-    return {p.stem: pd.read_csv(p) for p in sorted(Path(results_dir).glob("*.csv"))}
+    out = {}
+    for d in reversed(_dirs(results_dir)):
+        out.update({p.stem: pd.read_csv(p) for p in sorted(d.glob("*.csv"))})
+    return out
 
 
 def load_pool(results_dir=RESULTS):
@@ -105,10 +129,7 @@ def load_pool(results_dir=RESULTS):
                 continue
             found = [_parse(t)[0] for cell in df[col].dropna().astype(str).unique() for t in _NUMBER.findall(cell)]
             nums.append(np.asarray(found, dtype=float))
-    extra = list(_numbers_in(_manifest(results_dir)))
-    values_path = Path(results_dir) / "values.json"
-    if values_path.exists():
-        extra += list(_numbers_in(json.loads(values_path.read_text())))
+    extra = list(_numbers_in(_manifest(results_dir))) + list(_numbers_in(_values(results_dir)))
     return Pool(np.concatenate(nums + [np.asarray(extra, dtype=float)]))
 
 
@@ -136,8 +157,7 @@ def render_text(template_text, results_dir, tables):
     typed = [t for t in extract_numbers(_PLACEHOLDER.sub(" ", template_text)) if _parse(t)[0] not in constants]
     if typed:
         raise CheckError(f"numbers typed in template that are not declared text constants: {sorted(set(typed))}")
-    values_path = Path(results_dir) / "values.json"
-    values = json.loads(values_path.read_text()) if values_path.exists() else {}
+    values = _values(results_dir)
     results = load_results(results_dir)
 
     def sub(m):
@@ -177,15 +197,29 @@ def verdict(paired_ci, ci_a, ci_b, heavy=0.5):
     return "differs"
 
 
+POSTHOC = OUT / "results_posthoc"
+POSTHOC_DOCS = {
+    DOCS_DIR / "RESULTS_POSTHOC.template.md": OUT / "RESULTS_POSTHOC.md",
+    DOCS_DIR / "call_questions.template.md": OUT / "prep" / "call_questions.md",
+}
+
+
 def main(argv):
     from src.tables import TABLES
 
     cmd = argv[1] if len(argv) > 1 else "check"
-    pool = load_pool(RESULTS)
-    for template, out in DOCS.items():
+    jobs = [(t, o, RESULTS, TABLES, True) for t, o in DOCS.items()]
+    if POSTHOC.exists():
+        from src.posthoc.tables import POSTHOC_TABLES
+
+        jobs += [(t, o, [POSTHOC, RESULTS], {**TABLES, **POSTHOC_TABLES}, False) for t, o in POSTHOC_DOCS.items()]
+    for template, out, dirs, tables, required in jobs:
         if not template.exists():
-            raise CheckError(f"missing template {template}")
-        fresh = render_text(template.read_text(), RESULTS, TABLES)
+            if required:
+                raise CheckError(f"missing template {template}")
+            continue
+        pool = load_pool(dirs)
+        fresh = render_text(template.read_text(), dirs, tables)
         if cmd == "render":
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_text(fresh)
