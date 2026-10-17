@@ -1,5 +1,6 @@
+# Paths are relative to the repository root (run from there); they replaced the checker's absolute paths on 2026-10-17.
 import numpy as np, pandas as pd
-PRED = '/Users/iliaduda/baf-threshold-study/results/predictions'
+PRED = 'results/predictions'
 VARIANTS = ["Base","Variant I","Variant II","Variant III","Variant IV","Variant V"]
 F = 0.05; B = 1000
 rng = np.random.default_rng(20261016)
@@ -20,7 +21,7 @@ def fpr_w(s, neg, w, t):
     wn = w * neg
     return wn[s >= t].sum() / wn.sum()
 
-ci = pd.read_csv('/Users/iliaduda/baf-threshold-study/results/ci.csv')
+ci = pd.read_csv('results/ci.csv')
 ci = ci[(ci.model == 'lightgbm') & (ci.seed == 0) & (ci.fpr_target == 0.05) & (ci.age_def == '>=50') & (ci.metric == 'budget_miss')]
 rows = []
 for v in VARIANTS:

@@ -1,7 +1,8 @@
+# Paths are relative to the repository root (run from there); they replaced the checker's absolute paths on 2026-10-17.
 import numpy as np, pandas as pd, sys
 src = sys.argv[1]; dst = sys.argv[2]
 r = pd.read_csv(src)
-m = pd.read_csv('/Users/iliaduda/baf-threshold-study/results/metrics.csv')
+m = pd.read_csv('results/metrics.csv')
 m = m[(m.fpr_target == 0.05) & (m.age_def == '>=50')]
 K = ['variant','model','seed','strategy','month']
 print('stored rows for these strategies:', m[m.strategy.isin(r.strategy.unique())].shape[0],

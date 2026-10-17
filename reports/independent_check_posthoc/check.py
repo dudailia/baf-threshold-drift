@@ -1,9 +1,10 @@
+# Paths are relative to the repository root (run from there); they replaced the checker's absolute paths on 2026-10-17.
 import numpy as np
 import pandas as pd
 from sklearn.isotonic import IsotonicRegression
 
-R = "/Users/iliaduda/baf-threshold-study/"
-OUT = "/private/tmp/claude-501/-Users-iliaduda-baf-threshold-study/7b6ebe03-6436-4cc9-8a11-307ac6aacd03/scratchpad/independent_check_posthoc/"
+R = ""
+OUT = "checker_output/independent_check_posthoc/"
 VARIANTS = ["Base", "Variant I", "Variant II", "Variant III", "Variant IV", "Variant V"]
 SEEDS = range(5)
 F = 0.05

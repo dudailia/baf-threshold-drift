@@ -1,5 +1,6 @@
+# Paths are relative to the repository root (run from there); they replaced the checker's absolute paths on 2026-10-17.
 import numpy as np, pandas as pd, sys
-PRED = '/Users/iliaduda/baf-threshold-study/results/predictions'
+PRED = 'results/predictions'
 VARIANTS = ["Base","Variant I","Variant II","Variant III","Variant IV","Variant V"]
 MODELS = ["lightgbm","logreg"]; F = 0.05
 READING = sys.argv[1] if len(sys.argv) > 1 else 'literal'   # 'literal' or 'lowest_flagged'

@@ -72,3 +72,12 @@ Queue finished. Next step: the user's review of RESULTS_POSTHOC.md section 7 and
 | 5 claims audit | done | fresh subagent audited 111 claims (90 supported, 21 unsupported; 94 numbers spot-checked, 90 matched). Fixed: PSI claim (velocity_4w is the largest PSI feature in Base, II, III, IV; credit_risk_score only in I, V), TPR sensitivity stated as 0.0014 not 0.001, 'raise' for group-wise thresholds, 'only the positives' scores change', 'retraining was not studied', 'wrong null' stated as established, plus independence, causal and over-general wording. No number changed. |
 | 6 one-pager | done | rewritten from docs/one_pager.template.md; question, setup, three findings, limits; states one base, single validation split, arithmetic label-free results, amended claim |
 | 7 hygiene | done | reports/hygiene.md: personal email in commit metadata (all commits), absolute paths in the verbatim checker scripts; no credentials, IDs, phone numbers, data or other-project references |
+
+## Queue 2026-10-17 (afternoon)
+
+| Step | Status | Notes |
+|---|---|---|
+| 1 relative paths | done | four checker scripts; post hoc checker rerun, 0 mismatches |
+| 2 fresh-clone test | to do | |
+| 3 second claims audit | to do | after step 4 text |
+| 4 limits, data origin, interval widths | to do | |

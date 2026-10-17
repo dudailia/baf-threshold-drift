@@ -11,3 +11,4 @@ results/sample_run/
 results_posthoc/predictions/
 results_posthoc/checkpoints/
 results_posthoc/logs/
+checker_output/
