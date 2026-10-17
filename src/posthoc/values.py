@@ -30,7 +30,27 @@ def build():
     d = {}
     R = lambda name: pd.read_csv(OUT / f"{name}.csv")  # noqa: E731
 
-    s, c = R("rolling_summary"), R("rolling_ci")
+    have = lambda *names: all((OUT / f"{n}.csv").exists() for n in names)  # noqa: E731
+
+    if have("rolling_summary", "rolling_ci"):
+        _rolling(R("rolling_summary"), R("rolling_ci"), d)
+    if have("mechanism_quantiles", "mechanism_features", "mechanism_refit_check"):
+        _mechanism(R("mechanism_quantiles"), R("mechanism_features"), R("mechanism_refit_check"), d)
+    if have("hyper_summary", "hyper_paired"):
+        _hyper(R("hyper_summary"), R("hyper_paired"), d)
+    if have("retrain_summary", "retrain_paired"):
+        _retrain(R("retrain_summary"), R("retrain_paired"), d)
+    if have("isotonic_summary", "isotonic_paired"):
+        _isotonic(R("isotonic_summary"), R("isotonic_paired"), d)
+    if have("independent_check"):
+        ic = R("independent_check")
+        d["independent/max_abs_diff"] = float(ic["max_abs_diff"].max())
+        d["independent/rows"] = int(ic["rows_compared"].sum())
+        d["independent/mismatches"] = int(ic["mismatches"].sum())
+    return d
+
+
+def _rolling(s, c, d):
     for split in sorted(s.split.unique()):
         for strategy in ("static", "label_free_top", "delayed_lag1", "oracle"):
             x = s[(s.split == split) & (s.strategy == strategy) & (s.metric == "budget_miss")]
@@ -48,7 +68,8 @@ def build():
         for v, g in t.groupby("variant"):
             d[f"rolling/{split}/{v}/oracle_tpr_m67"] = float(g[g.month.isin([6, 7])]["mean"].mean())
 
-    q, f, rc = R("mechanism_quantiles"), R("mechanism_features"), R("mechanism_refit_check")
+
+def _mechanism(q, f, rc, d):
     d["mechanism/refit_max_abs_diff"] = float(rc.max_abs_diff_refit_vs_saved.max())
     test = q[q.month >= 4]
     _range(test.ks_vs_month3_negatives, "mechanism/ks", d)
@@ -69,7 +90,8 @@ def build():
         _range(cr.shrink_mean, "mechanism/credit_risk_score/shrink_m567", d)
         d["mechanism/credit_risk_score/n_top_feature"] = int(sum(d[k] == "credit_risk_score" for k in d if k.endswith("/top_feature")))
 
-    hs, hp = R("hyper_summary"), R("hyper_paired")
+
+def _hyper(hs, hp, d):
     miss = hs[hs.metric == "budget_miss"]
     ref = miss[miss.config_rank == 0].set_index(["variant", "month"])["mean"]
     other = miss[miss.config_rank > 0]
@@ -88,7 +110,8 @@ def build():
     d["hyper/max_abs_change"] = float(np.max(diff))
     _verdicts(hp.assign(comparator=np.where(hp.config_label == "strongly regularised", "regularised", "tuned")), "hyper", d)
 
-    rs, rp = R("retrain_summary"), R("retrain_paired")
+
+def _retrain(rs, rp, d):
     m = rs[rs.metric == "budget_miss"]["mean"]
     _range(m, "retrain/miss", d)
     d["retrain/n_within_0.5pt"] = int((m.abs() <= 0.005).sum())
@@ -99,7 +122,8 @@ def build():
     tl = rp[(rp.comparator == "delayed_lag1") & (rp.metric == "tpr")]["diff"]
     _range(tl, "retrain/tpr_minus_lag1", d)
 
-    i_s, ip = R("isotonic_summary"), R("isotonic_paired")
+
+def _isotonic(i_s, ip, d):
     m = i_s[i_s.metric == "budget_miss"]["mean"]
     _range(m, "isotonic/miss", d)
     d["isotonic/n_within_0.5pt"] = int((m.abs() <= 0.005).sum())
@@ -108,14 +132,6 @@ def build():
     by_v = i_s[i_s.metric == "budget_miss"].groupby("variant")["mean"]
     for v, g in by_v:
         _range(g, f"isotonic/{v}/miss", d)
-    for name in ("independent_check",):
-        path = OUT / f"{name}.csv"
-        if path.exists():
-            ic = pd.read_csv(path)
-            d["independent/max_abs_diff"] = float(ic["max_abs_diff"].max())
-            d["independent/rows"] = int(ic["rows_compared"].sum())
-            d["independent/mismatches"] = int(ic["mismatches"].sum())
-    return d
 
 
 def main():
