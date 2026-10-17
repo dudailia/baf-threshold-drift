@@ -160,7 +160,7 @@ Variant V.
 
 The other variants are in results_posthoc/mechanism_features.csv. Across all variants, features and months 5 to 7, the mean shrink is positive in 43 of 180 cells and every draw shrinks the miss in 30; the largest mean shrink is 0.48 points (`phone_home_valid`, Variant I, month 5) against main-study static misses of 0.87 to 2.32 points in months 5 to 7. Replacing `credit_risk_score`, the feature with the largest population stability index in the main study, changes the miss by -0.16 to +0.00 points, and replacing `housing_status` widens it by 0.41 to 0.63 points on average per variant.
 
-Reading. This is a null result for single features: no one feature among the top 10, replaced on its own, accounts for the negatives' score drift. One-at-a-time replacement breaks the joint distribution of the features, so it can widen the miss (as for `housing_status`), and drift spread over several features or carried by their joint distribution would not show up here. It also qualifies the main RESULTS.md sentence that the `credit_risk_score` drift is "consistent with" the static misses: that feature's drift, replaced alone, does not explain them.
+Reading. No single feature explains the static miss: no one feature among the top 10, replaced on its own, accounts for the negatives' score drift. One-at-a-time replacement breaks the joint distribution of the features, so it can widen the miss (as for `housing_status`), and drift spread over several features or carried by their joint distribution would not show up here. It also qualifies the main RESULTS.md sentence that the `credit_risk_score` drift is "consistent with" the static misses: that feature's drift, replaced alone, does not explain them.
 
 ## 3. Hyperparameter sensitivity
 
@@ -334,11 +334,83 @@ A fresh agent that had not seen the code recomputed the stored metrics of tasks 
 
 All 1,890 recomputed rows match, with 0 mismatches; the largest absolute difference on any metric is floating-point rounding.
 
-## 7. What changes relative to the main study
+## 7. Control for the isotonic result
+
+Fixed label-free rules that flag the top 5.0%, 5.25%, 5.5%, 5.75% and 6.0% of each month's applications, on the same main-study scores (5 seeds), next to isotonic targeting (section 5). The last column is the alert volume at which realized FPR is exactly 5%, the oracle's (an upper bound, not deployable).
+
+| Variant | Month | Isotonic estimated FPR, budget miss pt | Fixed top 5% of applications, budget miss pt | Fixed top 5.25% of applications, budget miss pt | Fixed top 5.5% of applications, budget miss pt | Fixed top 5.75% of applications, budget miss pt | Fixed top 6% of applications, budget miss pt | Alert volume % at exactly 5% FPR (Oracle, upper bound) |
+|---|---|---|---|---|---|---|---|---|
+| Base | 4 | -0.10 | -0.57 | -0.33 | -0.09 | +0.15 | +0.39 | 5.59 |
+| Base | 5 | -0.22 | -0.55 | -0.31 | -0.07 | +0.17 | +0.41 | 5.57 |
+| Base | 6 | -0.18 | -0.59 | -0.35 | -0.11 | +0.13 | +0.37 | 5.61 |
+| Base | 7 | -0.36 | -0.70 | -0.46 | -0.23 | +0.01 | +0.25 | 5.74 |
+| Variant I | 4 | -0.02 | -0.52 | -0.28 | -0.04 | +0.20 | +0.44 | 5.54 |
+| Variant I | 5 | -0.17 | -0.53 | -0.29 | -0.05 | +0.19 | +0.43 | 5.55 |
+| Variant I | 6 | -0.19 | -0.58 | -0.35 | -0.11 | +0.13 | +0.37 | 5.62 |
+| Variant I | 7 | -0.32 | -0.69 | -0.45 | -0.21 | +0.03 | +0.26 | 5.72 |
+| Variant II | 4 | -0.10 | -0.53 | -0.29 | -0.05 | +0.19 | +0.43 | 5.55 |
+| Variant II | 5 | -0.25 | -0.56 | -0.32 | -0.08 | +0.16 | +0.40 | 5.59 |
+| Variant II | 6 | -0.25 | -0.62 | -0.38 | -0.15 | +0.10 | +0.33 | 5.65 |
+| Variant II | 7 | -0.33 | -0.69 | -0.46 | -0.23 | +0.01 | +0.25 | 5.74 |
+| Variant III | 4 | -0.05 | -1.05 | -0.81 | -0.57 | -0.33 | -0.09 | 6.09 |
+| Variant III | 5 | +0.03 | -0.64 | -0.39 | -0.14 | +0.10 | +0.35 | 5.65 |
+| Variant III | 6 | -0.01 | -0.85 | -0.61 | -0.36 | -0.12 | +0.13 | 5.87 |
+| Variant III | 7 | -0.03 | -0.63 | -0.38 | -0.13 | +0.11 | +0.35 | 5.64 |
+| Variant IV | 4 | -0.08 | -0.73 | -0.49 | -0.26 | -0.02 | +0.21 | 5.77 |
+| Variant IV | 5 | +0.02 | -0.43 | -0.19 | +0.05 | +0.29 | +0.53 | 5.45 |
+| Variant IV | 6 | +0.09 | -0.42 | -0.18 | +0.06 | +0.30 | +0.54 | 5.44 |
+| Variant IV | 7 | +0.15 | -0.33 | -0.09 | +0.15 | +0.39 | +0.64 | 5.34 |
+| Variant V | 4 | -0.06 | -1.06 | -0.82 | -0.58 | -0.34 | -0.09 | 6.10 |
+| Variant V | 5 | +0.04 | -0.63 | -0.38 | -0.14 | +0.11 | +0.36 | 5.64 |
+| Variant V | 6 | +0.08 | -0.35 | -0.11 | +0.14 | +0.38 | +0.62 | 5.36 |
+| Variant V | 7 | +0.16 | -0.26 | -0.01 | +0.23 | +0.48 | +0.73 | 5.26 |
+
+By the identity FPR = (alert share - TPR x prevalence) / (1 - prevalence), a month's FPR is exactly 5% at an alert share of 5% x (1 - prevalence) + TPR x prevalence; here that share ranges from 5.26% to 6.10% across variant-months. A fixed rule that flags the top 5.75% of applications, with no calibration and no labels, is within 0.5 points of budget in 24 of 24 variant-months, and the top 5.5% in 22, against 24 for isotonic targeting; the mean absolute miss is +0.18 points for the best fixed rule (top 5.5%) and +0.14 for isotonic. On the same resampled rows, isotonic has a smaller absolute miss than the top 5.5% rule in 9 variant-months, a larger one in 9 and is inconclusive in 6.
+
+Reading. Most of the isotonic result follows from the FPR identity at this prevalence: with fraud near 1% of applications and TPR near one half, flagging about 5.5% of applications already lands near 5% FPR, so any rule that aims at that share does nearly as well. Calibration adds a modest reduction in the average miss and adapts the share month by month, but the gain over a well-chosen fixed share is small, and choosing that share itself needs labels from some month.
+
+## 8. Validation month with the model held fixed
+
+The main model (trained on months 0 to 2) is held fixed; for every pair 3 <= m < t <= 7 the static threshold is set at 5% FPR on month m's negatives and applied to month t (seed 0 interval; seed mean and spread over 5 seeds).
+
+Base.
+
+| Threshold set on month | Month 4: budget miss pt, seed 0 [95% CI]; seed mean (sd) | Month 5: budget miss pt, seed 0 [95% CI]; seed mean (sd) | Month 6: budget miss pt, seed 0 [95% CI]; seed mean (sd) | Month 7: budget miss pt, seed 0 [95% CI]; seed mean (sd) |
+|---|---|---|---|---|
+| 3 | +0.05 [-0.11, +0.22]; +0.08 (0.02) | -1.90 [-2.02, -1.78]; -1.92 (0.02) | -1.04 [-1.20, -0.89]; -0.98 (0.04) | -2.10 [-2.21, -1.97]; -2.01 (0.08) |
+| 4 |  | -1.93 [-2.06, -1.80]; -1.97 (0.03) | -1.08 [-1.26, -0.92]; -1.05 (0.03) | -2.13 [-2.26, -1.99]; -2.06 (0.08) |
+| 5 |  |  | +1.16 [+0.97, +1.36]; +1.24 (0.05) | -0.47 [-0.61, -0.29]; -0.29 (0.14) |
+| 6 |  |  |  | -1.34 [-1.47, -1.16]; -1.25 (0.09) |
+
+Variant II.
+
+| Threshold set on month | Month 4: budget miss pt, seed 0 [95% CI]; seed mean (sd) | Month 5: budget miss pt, seed 0 [95% CI]; seed mean (sd) | Month 6: budget miss pt, seed 0 [95% CI]; seed mean (sd) | Month 7: budget miss pt, seed 0 [95% CI]; seed mean (sd) |
+|---|---|---|---|---|
+| 3 | +0.01 [-0.16, +0.17]; +0.05 (0.04) | -2.04 [-2.16, -1.92]; -2.05 (0.04) | -1.26 [-1.40, -1.10]; -1.25 (0.04) | -1.67 [-1.83, -1.51]; -1.65 (0.10) |
+| 4 |  | -2.05 [-2.17, -1.92]; -2.09 (0.03) | -1.26 [-1.42, -1.12]; -1.29 (0.03) | -1.68 [-1.83, -1.52]; -1.69 (0.09) |
+| 5 |  |  | +1.03 [+0.81, +1.23]; +1.08 (0.07) | +0.54 [+0.32, +0.73]; +0.59 (0.09) |
+| 6 |  |  |  | -0.44 [-0.63, -0.25]; -0.45 (0.07) |
+
+Variant V.
+
+| Threshold set on month | Month 4: budget miss pt, seed 0 [95% CI]; seed mean (sd) | Month 5: budget miss pt, seed 0 [95% CI]; seed mean (sd) | Month 6: budget miss pt, seed 0 [95% CI]; seed mean (sd) | Month 7: budget miss pt, seed 0 [95% CI]; seed mean (sd) |
+|---|---|---|---|---|
+| 3 | +0.08 [-0.09, +0.24]; +0.12 (0.05) | -1.63 [-1.76, -1.52]; -1.59 (0.03) | -1.15 [-1.28, -1.02]; -1.12 (0.08) | -1.18 [-1.33, -1.04]; -1.14 (0.16) |
+| 4 |  | -1.69 [-1.83, -1.57]; -1.69 (0.02) | -1.20 [-1.35, -1.08]; -1.21 (0.10) | -1.24 [-1.39, -1.10]; -1.24 (0.19) |
+| 5 |  |  | +0.70 [+0.49, +0.87]; +0.64 (0.09) | +0.67 [+0.46, +0.84]; +0.65 (0.24) |
+| 6 |  |  |  | -0.00 [-0.17, +0.18]; +0.01 (0.15) |
+
+The other variants are in results_posthoc/valmonth_summary.csv and valmonth_ci.csv. Across all variants, 44 of 60 pairs have a seed 0 interval entirely below zero, 10 entirely above and 6 contain zero. Thresholds set on month 3 or 4 under-spend in every later month from 5 to 7, while a threshold set on month 5 over-spends in 9 of its 12 cells (miss -0.86 to +1.24 points). For a given test month, the sign of the miss depends on the threshold month in 9 of 18 variant-month cells that have more than one possible threshold month.
+
+Reading. With the model and its training window held fixed, the direction of the static miss still depends on the month the threshold is set on, so the reversal in section 1 is not only a training-window effect. A threshold set on a month whose negatives score low (month 5) over-spends in the following month, and one set on a month whose negatives score high (months 3 and 4) under-spends.
+
+## 9. What changes relative to the main study
 
 Contradictions. The main study's README, one-pager and RESULTS.md say that the static threshold under-spends its budget in months 5 to 7. Post hoc, that holds when the threshold is set on month 3 or month 4, but a threshold set on month 2 over-spends in every later month (section 1): the robust finding is that a threshold set once misses its budget, by more than half a point in most later months, with a sign that depends on the validation month. The main RESULTS.md also calls the `credit_risk_score` drift "consistent with" the static misses; replacing that feature alone does not reduce them (section 2).
 
 Qualifications. The main study's statement that label-free targeting to the validation alert rate holds the budget best is true among the pre-declared strategies; post hoc, isotonic estimated-FPR targeting (section 5) is within 0.5 points in every variant-month, including where the validation-rate strategy overshoots, but it was chosen after seeing the results. Retraining with a previous-month threshold (section 4) adds TPR but not budget control.
+
+The validation month alone, with the model held fixed, also reverses the sign (section 8). Most of the isotonic result follows from the FPR identity: a fixed share of about 5.5% to 5.75% of applications does nearly as well (section 7).
 
 Confirmations. With the threshold set on month 3, the sign of the static miss in months 5 to 7 does not depend on the tuned configuration or on strong regularisation (section 3); label-free top 5% stays under budget and delayed-label lag 1 keeps swinging on both new splits (section 1).
 

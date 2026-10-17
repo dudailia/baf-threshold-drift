@@ -151,3 +151,49 @@ def isotonic(results, arg=None):
 
 POSTHOC_TABLES = dict(rolling=rolling, mechanism_quantiles=mechanism_quantiles, mechanism_features=mechanism_features,
                       hyper=hyper, retrain=retrain, isotonic=isotonic)
+
+
+def valmonth(results, variant):
+    s = results["valmonth_summary"]
+    s = s[s.variant == variant]
+    c = results["valmonth_ci"]
+    c = c[(c.variant == variant) & (c.metric == "budget_miss")]
+    S = {(r.threshold_month, r.month): r for r in s.itertuples()}
+    C = {(r.threshold_month, r.month): r for r in c.itertuples()}
+    tests = sorted(s.month.unique())
+    header = ["Threshold set on month"] + [f"Month {t}: budget miss pt, seed 0 [95% CI]; seed mean (sd)" for t in tests]
+    rows = []
+    for m in sorted(s.threshold_month.unique()):
+        row = [m]
+        for t in tests:
+            if (m, t) not in S:
+                row.append("")
+                continue
+            r, ci = S[(m, t)], C[(m, t)]
+            row.append(f"{_pt(ci.estimate)} [{_pt(ci.lo)}, {_pt(ci.hi)}]; {_pt(r.mean)} ({_num(100 * r.sd, 2)})")
+        rows.append(row)
+    return _md(header, rows)
+
+
+def fixedq(results, arg=None):
+    f = results["fixedq_summary"]
+    f = f[f.metric == "budget_miss"]
+    F = {(r.variant, r.rule, r.month): r.mean for r in f.itertuples()}
+    iso = results["isotonic_summary"]
+    iso = {(r.variant, r.month): r.mean for r in iso[iso.metric == "budget_miss"].itertuples()}
+    main = results["summary"]
+    main = main[(main.model == "lightgbm") & np.isclose(main.fpr_target, 0.05) & (main.age_def == ">=50") & (main.strategy == "oracle") & (main.metric == "alert_rate")]
+    alert = {(r.variant, r.month): r.mean for r in main.itertuples()}
+    rules = sorted(f.rule.unique(), key=lambda x: float(x.split()[1].rstrip("%")))
+    header = ["Variant", "Month", "Isotonic estimated FPR, budget miss pt"] + [f"Fixed {r} of applications, budget miss pt" for r in rules] + \
+             ["Alert volume % at exactly 5% FPR (Oracle, upper bound)"]
+    rows = []
+    for v in VARIANTS:
+        for m in (4, 5, 6, 7):
+            if (v, m) not in iso:
+                continue
+            rows.append([v, m, _pt(iso[(v, m)])] + [_pt(F[(v, r, m)]) for r in rules] + [_pct(alert[(v, m)], 2)])
+    return _md(header, rows)
+
+
+POSTHOC_TABLES.update(valmonth=valmonth, fixedq=fixedq)

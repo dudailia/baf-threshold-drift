@@ -12,7 +12,7 @@ It must concede the failure plainly: pooled TPR 0.117 against the declared 0.05 
 
 ## 3. Is the static under-spend real, or an artefact of month 3?
 
-This is the weakest main finding, and the answer must say so. On the main split the miss is -0.87 to -2.32 points in months 5 to 7, with all 18 intervals below zero, and logistic regression agrees. Post hoc, a threshold set on month 4 also under-spends (18 of 18 intervals below zero), but one set on month 2 over-spends by +0.33 to +5.82 points. So "a threshold set once misses its budget" holds on every split; "it under-spends" depends on the validation month. Post hoc, the sign in months 5 to 7 is stable across the five best tuning trials and a strongly regularised model (0 sign changes in 90 cells), and no single top-10 feature, replaced by month 3 draws, explains the negatives' score drift.
+This is the weakest main finding, and the answer must say so. On the main split the miss is -0.87 to -2.32 points in months 5 to 7, with all 18 intervals below zero, and logistic regression agrees. Post hoc, a threshold set on month 4 also under-spends (18 of 18 intervals below zero), but one set on month 2 over-spends by +0.33 to +5.82 points. So "a threshold set once misses its budget" holds on every split; "it under-spends" depends on the validation month. Post hoc, the sign in months 5 to 7 is stable across the five best tuning trials and a strongly regularised model (0 sign changes in 90 cells), no single feature explains the static miss, and with the model held fixed the sign still depends on the threshold month in 9 of 18 cells (RESULTS_POSTHOC.md section 8), so the reversal is not only a training-window effect.
 
 ## 4. Why make budget miss primary rather than TPR at 5% FPR?
 
@@ -20,7 +20,7 @@ Because every strategy thresholds the same scores of the same month, all operati
 
 ## 5. Label-free at the validation alert rate looks best. When does it fail?
 
-It assumes the fraud rate stays near the validation month's. It is within 0.5 points in 22 of 24 variant-months but goes over budget, up to +0.70 points, where the fraud rate falls below month 3's (Variants III to V), as the synthetic mechanism study predicts for a prevalence shift. Top 5% of applications is under budget everywhere for the arithmetic reason that frauds take part of the alerts. Post hoc and exploratory, estimating each month's FPR from isotonic-calibrated probabilities (fitted on month 3 only) stays within 0.5 points in 24 of 24 variant-months, which suggests the fix for the prevalence assumption, but it was chosen after seeing the results and needs a pre-registered test.
+It assumes the fraud rate stays near the validation month's. It is within 0.5 points in 22 of 24 variant-months but goes over budget, up to +0.70 points, where the fraud rate falls below month 3's (Variants III to V), as the synthetic mechanism study predicts for a prevalence shift. Top 5% of applications is under budget everywhere for the arithmetic reason that frauds take part of the alerts. Post hoc and exploratory, estimating each month's FPR from isotonic-calibrated probabilities (fitted on month 3 only) stays within 0.5 points in 24 of 24 variant-months, but most of that follows from the FPR identity at this prevalence: the alert share that gives exactly 5% FPR is 5.26% to 6.10% of applications, and a fixed rule that flags the top 5.75% is within 0.5 points in 24 of 24 variant-months too (RESULTS_POSTHOC.md section 7). Calibration adds a modest reduction in the average miss; it was chosen after seeing the results and needs a pre-registered test.
 
 ## 6. Do your intervals include threshold-estimation uncertainty, and are they too narrow?
 
@@ -46,7 +46,7 @@ Logistic regression shows the same direction (-1.41 to -2.92 points). Post hoc, 
 
 - That any of this holds for real fraud data: BAF is synthetic, and all six variants come from one generator.
 - That the static miss has a fixed sign: post hoc, it reverses with an earlier validation month.
-- Which features drive the negatives' score drift: single-feature replacement does not explain it.
+- Which features drive the negatives' score drift: no single feature explains the static miss.
 - Anything about retraining at scale, threshold policies with human review capacity, or costs.
 - That the shuffled-label check passed: it did not, against its declared tolerance.
 - Anything about fairness interventions beyond the group-wise threshold diagnostic, or about protected attributes other than age.

@@ -48,6 +48,10 @@ def build():
         _retrain(R("retrain_summary"), R("retrain_paired"), d)
     if have("isotonic_summary", "isotonic_paired"):
         _isotonic(R("isotonic_summary"), R("isotonic_paired"), d)
+    if have("valmonth_summary", "valmonth_ci"):
+        _valmonth(R("valmonth_summary"), R("valmonth_ci"), d)
+    if have("fixedq_summary", "fixedq_paired", "isotonic_summary"):
+        _fixedq(R("fixedq_summary"), R("fixedq_paired"), R("isotonic_summary"), d)
     main_ic = config_root() / "results" / "independent_check.csv"
     if main_ic.exists():
         m = pd.read_csv(main_ic)
@@ -172,8 +176,59 @@ def main():
     # Post hoc text constants: configuration settings quoted in the write-up (not results).
     consts = sorted({v for v in REGULARISED.values() if isinstance(v, (int, float)) and not isinstance(v, bool)} | {N_DRAWS})
     consts = sorted(set(consts) | {17})  # the day in 'Amendment 2026-10-17'
+    from src.posthoc.fixedq import QS
+
+    consts = sorted(set(consts) | {round(100 * q, 2) for q in QS})  # fixed-rule shares quoted in the write-up
     (OUT / "manifest.json").write_text(json.dumps(dict(text_constants=consts, regularised_config=REGULARISED, main_results_commit="125042c"), indent=1))
     print(f"wrote {len(d)} values")
+
+
+
+def _valmonth(s, c, d):
+    ci = c[c.metric == "budget_miss"]
+    d["valmonth/n_pairs"] = int(len(ci))
+    d["valmonth/n_pairs_variants"] = int(len(ci))
+    d["valmonth/n_ci_below_zero"] = int((ci.hi < 0).sum())
+    d["valmonth/n_ci_above_zero"] = int((ci.lo > 0).sum())
+    d["valmonth/n_ci_contains_zero"] = int(((ci.lo <= 0) & (ci.hi >= 0)).sum())
+    # Does the sign of the seed-mean miss at a test month depend on the threshold month?
+    changes, cells = 0, 0
+    for (v, t), g in s.groupby(["variant", "month"]):
+        if len(g) < 2:
+            continue
+        cells += 1
+        changes += int(len(set(np.sign(g["mean"]))) > 1)
+    d["valmonth/n_test_cells_multi_m"] = cells
+    d["valmonth/n_test_cells_sign_depends_on_m"] = changes
+    for m, g in s.groupby("threshold_month"):
+        _range(g["mean"], f"valmonth/m{m}/miss", d)
+        d[f"valmonth/m{m}/n_negative"] = int((g["mean"] < 0).sum())
+        d[f"valmonth/m{m}/n_positive"] = int((g["mean"] > 0).sum())
+        d[f"valmonth/m{m}/n"] = int(len(g))
+    for (m, t), g in s.groupby(["threshold_month", "month"]):
+        _range(g["mean"], f"valmonth/m{m}/t{t}/miss", d)
+
+
+def _fixedq(f, p, iso, d):
+    miss = f[f.metric == "budget_miss"]
+    im = iso[iso.metric == "budget_miss"]["mean"]
+    for rule, g in miss.groupby("rule"):
+        key = rule.replace(" ", "_").replace("%", "pct")
+        _range(g["mean"], f"fixedq/{key}/miss", d)
+        d[f"fixedq/{key}/n_within_0.5pt"] = int((g["mean"].abs() <= 0.005).sum())
+        d[f"fixedq/{key}/n"] = int(len(g))
+        q = p[p.rule == rule]
+        d[f"fixedq/{key}/iso_smaller"] = int(((q.verdict == "differs") & (q["diff"] < 0)).sum())
+        d[f"fixedq/{key}/iso_larger"] = int(((q.verdict == "differs") & (q["diff"] > 0)).sum())
+        d[f"fixedq/{key}/inconclusive"] = int((q.verdict == "inconclusive").sum())
+    best = miss.assign(a=miss["mean"].abs()).groupby("rule")["a"].mean().idxmin()
+    d["fixedq/best_rule"] = best
+    d["fixedq/best_rule_key"] = best.replace(" ", "_").replace("%", "pct")
+    d["fixedq/isotonic/mean_abs_miss"] = float(im.abs().mean())
+    d["fixedq/best_rule/mean_abs_miss"] = float(miss[miss.rule == best]["mean"].abs().mean())
+    main = pd.read_csv(config_root() / "results" / "summary.csv")
+    a = main[(main.model == "lightgbm") & np.isclose(main.fpr_target, 0.05) & (main.age_def == ">=50") & (main.strategy == "oracle") & (main.metric == "alert_rate")]["mean"]
+    _range(a, "fixedq/oracle_alert_rate", d)
 
 
 if __name__ == "__main__":

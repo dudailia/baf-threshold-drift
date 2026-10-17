@@ -46,7 +46,7 @@ Variant V.
 
 The other variants are in results_posthoc/mechanism_features.csv. Across all variants, features and months 5 to 7, the mean shrink is positive in {{value:mechanism/n_mean_shrink_positive_m567|int}} of {{value:mechanism/n_cells_m567|int}} cells and every draw shrinks the miss in {{value:mechanism/n_all_draws_shrink_m567|int}}; the largest mean shrink is {{value:mechanism/max_shrink_m567|apt2}} points (`{{value:mechanism/max_shrink_feature|str}}`, {{value:mechanism/max_shrink_variant|str}}, month {{value:mechanism/max_shrink_month|int}}) against main-study static misses of {{value:derived/static/miss_m567/max|apt2}} to {{value:derived/static/miss_m567/min|apt2}} points in months 5 to 7. Replacing `credit_risk_score`, the feature with the largest population stability index in the main study, changes the miss by {{value:mechanism/credit_risk_score/shrink_m567/min|pt2}} to {{value:mechanism/credit_risk_score/shrink_m567/max|pt2}} points, and replacing `housing_status` widens it by {{value:mechanism/housing_status/shrink_m567_by_variant/max|apt2}} to {{value:mechanism/housing_status/shrink_m567_by_variant/min|apt2}} points on average per variant.
 
-Reading. This is a null result for single features: no one feature among the top 10, replaced on its own, accounts for the negatives' score drift. One-at-a-time replacement breaks the joint distribution of the features, so it can widen the miss (as for `housing_status`), and drift spread over several features or carried by their joint distribution would not show up here. It also qualifies the main RESULTS.md sentence that the `credit_risk_score` drift is "consistent with" the static misses: that feature's drift, replaced alone, does not explain them.
+Reading. No single feature explains the static miss: no one feature among the top 10, replaced on its own, accounts for the negatives' score drift. One-at-a-time replacement breaks the joint distribution of the features, so it can widen the miss (as for `housing_status`), and drift spread over several features or carried by their joint distribution would not show up here. It also qualifies the main RESULTS.md sentence that the `credit_risk_score` drift is "consistent with" the static misses: that feature's drift, replaced alone, does not explain them.
 
 ## 3. Hyperparameter sensitivity
 
@@ -96,11 +96,43 @@ A fresh agent that had not seen the code recomputed the stored metrics of tasks 
 
 All {{value:independent/rows|int}} recomputed rows match, with {{value:independent/mismatches|int}} mismatches; the largest absolute difference on any metric is floating-point rounding.
 
-## 7. What changes relative to the main study
+## 7. Control for the isotonic result
+
+Fixed label-free rules that flag the top 5.0%, 5.25%, 5.5%, 5.75% and 6.0% of each month's applications, on the same main-study scores (5 seeds), next to isotonic targeting (section 5). The last column is the alert volume at which realized FPR is exactly 5%, the oracle's (an upper bound, not deployable).
+
+{{table:fixedq}}
+
+By the identity FPR = (alert share - TPR x prevalence) / (1 - prevalence), a month's FPR is exactly 5% at an alert share of 5% x (1 - prevalence) + TPR x prevalence; here that share ranges from {{value:fixedq/oracle_alert_rate/min|pct2}}% to {{value:fixedq/oracle_alert_rate/max|pct2}}% across variant-months. A fixed rule that flags the top 5.75% of applications, with no calibration and no labels, is within 0.5 points of budget in {{value:fixedq/top_5.75pct/n_within_0.5pt|int}} of {{value:fixedq/top_5.75pct/n|int}} variant-months, and the top 5.5% in {{value:fixedq/top_5.5pct/n_within_0.5pt|int}}, against {{value:isotonic/n_within_0.5pt|int}} for isotonic targeting; the mean absolute miss is {{value:fixedq/best_rule/mean_abs_miss|pt2}} points for the best fixed rule ({{value:fixedq/best_rule|str}}) and {{value:fixedq/isotonic/mean_abs_miss|pt2}} for isotonic. On the same resampled rows, isotonic has a smaller absolute miss than the top 5.5% rule in {{value:fixedq/top_5.5pct/iso_smaller|int}} variant-months, a larger one in {{value:fixedq/top_5.5pct/iso_larger|int}} and is inconclusive in {{value:fixedq/top_5.5pct/inconclusive|int}}.
+
+Reading. Most of the isotonic result follows from the FPR identity at this prevalence: with fraud near 1% of applications and TPR near one half, flagging about 5.5% of applications already lands near 5% FPR, so any rule that aims at that share does nearly as well. Calibration adds a modest reduction in the average miss and adapts the share month by month, but the gain over a well-chosen fixed share is small, and choosing that share itself needs labels from some month.
+
+## 8. Validation month with the model held fixed
+
+The main model (trained on months 0 to 2) is held fixed; for every pair 3 <= m < t <= 7 the static threshold is set at 5% FPR on month m's negatives and applied to month t (seed 0 interval; seed mean and spread over 5 seeds).
+
+Base.
+
+{{table:valmonth|Base}}
+
+Variant II.
+
+{{table:valmonth|Variant II}}
+
+Variant V.
+
+{{table:valmonth|Variant V}}
+
+The other variants are in results_posthoc/valmonth_summary.csv and valmonth_ci.csv. Across all variants, {{value:valmonth/n_ci_below_zero|int}} of {{value:valmonth/n_pairs|int}} pairs have a seed 0 interval entirely below zero, {{value:valmonth/n_ci_above_zero|int}} entirely above and {{value:valmonth/n_ci_contains_zero|int}} contain zero. Thresholds set on month 3 or 4 under-spend in every later month from 5 to 7, while a threshold set on month 5 over-spends in {{value:valmonth/m5/n_positive|int}} of its {{value:valmonth/m5/n|int}} cells (miss {{value:valmonth/m5/miss/min|pt2}} to {{value:valmonth/m5/miss/max|pt2}} points). For a given test month, the sign of the miss depends on the threshold month in {{value:valmonth/n_test_cells_sign_depends_on_m|int}} of {{value:valmonth/n_test_cells_multi_m|int}} variant-month cells that have more than one possible threshold month.
+
+Reading. With the model and its training window held fixed, the direction of the static miss still depends on the month the threshold is set on, so the reversal in section 1 is not only a training-window effect. A threshold set on a month whose negatives score low (month 5) over-spends in the following month, and one set on a month whose negatives score high (months 3 and 4) under-spends.
+
+## 9. What changes relative to the main study
 
 Contradictions. The main study's README, one-pager and RESULTS.md say that the static threshold under-spends its budget in months 5 to 7. Post hoc, that holds when the threshold is set on month 3 or month 4, but a threshold set on month 2 over-spends in every later month (section 1): the robust finding is that a threshold set once misses its budget, by more than half a point in most later months, with a sign that depends on the validation month. The main RESULTS.md also calls the `credit_risk_score` drift "consistent with" the static misses; replacing that feature alone does not reduce them (section 2).
 
 Qualifications. The main study's statement that label-free targeting to the validation alert rate holds the budget best is true among the pre-declared strategies; post hoc, isotonic estimated-FPR targeting (section 5) is within 0.5 points in every variant-month, including where the validation-rate strategy overshoots, but it was chosen after seeing the results. Retraining with a previous-month threshold (section 4) adds TPR but not budget control.
+
+The validation month alone, with the model held fixed, also reverses the sign (section 8). Most of the isotonic result follows from the FPR identity: a fixed share of about 5.5% to 5.75% of applications does nearly as well (section 7).
 
 Confirmations. With the threshold set on month 3, the sign of the static miss in months 5 to 7 does not depend on the tuned configuration or on strong regularisation (section 3); label-free top 5% stays under budget and delayed-label lag 1 keeps swinging on both new splits (section 1).
 
