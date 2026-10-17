@@ -1,0 +1,54 @@
+{
+ "files": [
+  "Base.csv",
+  "Variant I.csv",
+  "Variant II.csv",
+  "Variant III.csv",
+  "Variant IV.csv",
+  "Variant V.csv"
+ ],
+ "ignored": [],
+ "tripwires": [],
+ "age_choice": ">=50",
+ "age_reason": ">=50 matches Table 1 group sizes better",
+ "mean_group_size_diff": {
+  ">50": 0.30657142857142855,
+  ">=50": 0.012357142857142858
+ },
+ "split_overlap": {
+  "Base": {
+   "within_file_duplicates": 0,
+   "cross_split_main": 0,
+   "cross_split_paper": 0
+  },
+  "Variant I": {
+   "within_file_duplicates": 0,
+   "cross_split_main": 0,
+   "cross_split_paper": 0
+  },
+  "Variant II": {
+   "within_file_duplicates": 0,
+   "cross_split_main": 0,
+   "cross_split_paper": 0
+  },
+  "Variant III": {
+   "within_file_duplicates": 0,
+   "cross_split_main": 0,
+   "cross_split_paper": 0
+  },
+  "Variant IV": {
+   "within_file_duplicates": 0,
+   "cross_split_main": 0,
+   "cross_split_paper": 0
+  },
+  "Variant V": {
+   "within_file_duplicates": 0,
+   "cross_split_main": 0,
+   "cross_split_paper": 0
+  }
+ },
+ "base_monthly_fraud_range": [
+  0.0085,
+  0.015
+ ]
+}

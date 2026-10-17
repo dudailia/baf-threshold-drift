@@ -45,7 +45,7 @@ TABLE1 = {
 def md_table(df, floatfmt="{:.4f}"):
     cols = list(df.columns)
     lines = ["| " + " | ".join(map(str, cols)) + " |", "|" + "---|" * len(cols)]
-    for _, row in df.iterrows():
+    for row in df.itertuples(index=False):
         cells = [floatfmt.format(v) if isinstance(v, (float, np.floating)) else str(v) for v in row]
         lines.append("| " + " | ".join(cells) + " |")
     return "\n".join(lines)
