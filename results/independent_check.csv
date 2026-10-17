@@ -1,0 +1,4 @@
+predictions_commit,check,rows_compared,metrics,max_abs_diff,mismatches,median_ratio,min_ratio,max_ratio,rows_differing,max_abs_diff_tpr,max_abs_diff_realized_fpr,max_abs_diff_fpr_ratio
+0be4b0ddf844b12493d29d3585329fa792f203ab,point metrics recomputed,1200,10.0,0.0,0.0,,,,,,,
+0be4b0ddf844b12493d29d3585329fa792f203ab,"bootstrap width ratio, budget miss (checker / stored)",48,1.0,,0.0,1.0041543873107672,0.8833475907586498,1.0971181202688836,,,,
+0be4b0ddf844b12493d29d3585329fa792f203ab,threshold at lowest flagged score (sensitivity),1200,,,,,,,1200.0,0.0014174344436569,5.627597739320256e-05,0.0024700436637804
