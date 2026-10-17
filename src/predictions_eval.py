@@ -113,3 +113,16 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def prediction_texts(path=config.ROOT / "PREDICTIONS.md"):
+    """Answer text per scored id, read verbatim from PREDICTIONS.md."""
+    import re
+
+    text = path.read_text()
+    answers = dict(re.findall(r"^(\d+)\. (.+)$", text.split("## Answers")[1].split("## Additional")[0], flags=re.M))
+    extra = dict(re.findall(r"^([AB])\. (.+)$", text.split("## Additional predictions")[1], flags=re.M))
+    out = {k: v for k, v in answers.items() if k != "2"}
+    out["2 (static FPR)"] = out["2 (label-free FPR)"] = answers["2"]
+    out.update(extra)
+    return out

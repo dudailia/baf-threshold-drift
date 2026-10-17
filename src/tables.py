@@ -268,3 +268,50 @@ TABLES = {
     "exploratory_targets": exploratory_targets,
     "csv": csv_table,
 }
+
+
+def budget_overview(results, variant=None):
+    """Signed budget miss per deployable strategy and the oracle, seed mean, with the paired verdict against static."""
+    c = _Cells(results)
+    p = _select(results["paired"])
+    p = p[(p.seed == 0) & (p.comparator == "static") & (p.metric == "abs_budget_miss")]
+    verdicts = {(r.variant, r.strategy, r.month): r.verdict for r in p.itertuples()}
+    strategies = ["static", "label_free_top", "label_free_val_rate", "delayed_lag1", "oracle"]
+    header = ["Variant", "Month"] + [f"{LABELS[s]}, budget miss pt" for s in strategies] + \
+             [f"{LABELS[s]} vs static, absolute miss" for s in ("label_free_top", "label_free_val_rate", "delayed_lag1")]
+    rows = []
+    for v in [variant] if variant else VARIANTS:
+        for m in TEST_MONTHS:
+            if (v, "static", m) not in c.meta:
+                continue
+            rows.append([v, m] + [c.mean(v, s, m, "budget_miss", "pt") for s in strategies]
+                        + [verdicts.get((v, s, m), "n/a") for s in ("label_free_top", "label_free_val_rate", "delayed_lag1")])
+    return _md(header, rows)
+
+
+def groupwise(results, variant=None):
+    """Exploratory diagnostics that use the protected attribute at decision time; not recommendations."""
+    c = _Cells(results)
+    header = ["Variant", "Strategy", "Month", "Realized FPR %, seed mean", "TPR %, seed mean", "FPR younger %", "FPR older %", "FPR ratio"]
+    rows = []
+    for v in [variant] if variant else VARIANTS:
+        for s in ("static", "groupwise_static", "label_free_top", "groupwise_label_free"):
+            for m in TEST_MONTHS:
+                if (v, s, m) not in c.meta:
+                    continue
+                rows.append([v, LABELS[s], m, c.mean(v, s, m, "realized_fpr"), c.mean(v, s, m, "tpr", d=1), c.mean(v, s, m, "fpr_young"),
+                             c.mean(v, s, m, "fpr_old"), c.mean(v, s, m, "fpr_ratio", "num", 3)])
+    return _md(header, rows)
+
+
+def predictions(results, arg=None):
+    """PREDICTIONS.md line by line, with the result under the rules declared in PROTOCOL.md."""
+    from src.predictions_eval import prediction_texts
+
+    texts = prediction_texts()
+    ps = results["predictions_scored"]
+    rows = [[r.prediction, texts[r.prediction], r.result, r.detail] for r in ps.itertuples()]
+    return _md(["#", "Prediction (verbatim, PREDICTIONS.md)", "Result", "What happened (seed means)"], rows)
+
+
+TABLES.update(budget_overview=budget_overview, groupwise=groupwise, predictions=predictions)

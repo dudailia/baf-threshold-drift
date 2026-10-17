@@ -99,6 +99,12 @@ def load_pool(results_dir=RESULTS):
     for df in load_results(results_dir).values():
         num = df.select_dtypes("number").to_numpy(dtype=float).ravel()
         nums.append(num)
+        # Numbers inside generated text columns (for example predictions_scored.csv details).
+        for col in df.select_dtypes(exclude="number").columns:
+            if col == "predictions_commit":
+                continue
+            found = [_parse(t)[0] for cell in df[col].dropna().astype(str).unique() for t in _NUMBER.findall(cell)]
+            nums.append(np.asarray(found, dtype=float))
     extra = list(_numbers_in(_manifest(results_dir)))
     values_path = Path(results_dir) / "values.json"
     if values_path.exists():
