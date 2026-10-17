@@ -53,8 +53,10 @@ Everything here is post hoc (PROTOCOL.md, "Post hoc analyses"). Outputs: results
 | 4 retraining | done | src/posthoc/retrain.py | retrain_*.csv. Miss -1.97 to +1.76 pt (5 of 18 within 0.5 pt); validation-rate label-free smaller absolute miss in 13 of 18; TPR vs lag 1 -0.7 to +6.6 pt. |
 | 5 isotonic | done | src/posthoc/isotonic.py | isotonic_*.csv. Within 0.5 pt in 24 of 24 variant-months (miss -0.36 to +0.16); smaller absolute miss than top 5% in 24/24, than static in 19, vs validation rate 9 smaller / 9 larger / 6 inconclusive. |
 | 6 call prep | done | docs/call_questions.template.md | prep/call_questions.md (rendered and checked by src/trace.py) |
-| 7 independent check | running (fresh subagent) | brief in the scratchpad: independent_check_posthoc_prompt.md | results_posthoc/independent_check.csv |
+| 7 independent check | done, 0 mismatches in 1,890 rows | reports/independent_check_posthoc/check.py | results_posthoc/independent_check.csv |
 
 Post hoc findings that contradict the main study so far: the sign of the static miss depends on the validation month (task 1, split A); credit_risk_score drift alone does not explain the static miss (task 2), against the main RESULTS.md PSI sentence. Not a contradiction but an extension: isotonic label-free targeting (task 5) holds the budget in 24 of 24 variant-months.
 
-Hard stops fired so far: none.
+Hard stops fired: none. Verified: no change since 125042c to results/, RESULTS.md, README.md, reports/one_pager.md, PREDICTIONS.md, their templates or src/predictions_eval.py; PROTOCOL.md only appended.
+
+Queue finished. Next step: the user's review of RESULTS_POSTHOC.md section 7 and a decision on whether to reword the main documents' 'under-spends' statement (left unchanged on purpose).

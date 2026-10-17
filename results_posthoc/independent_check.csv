@@ -1,0 +1,5 @@
+predictions_commit,main_results_commit,check,rows_compared,metrics,max_abs_diff,mismatches
+0be4b0ddf844b12493d29d3585329fa792f203ab,125042c,task 1 rolling-origin,960,3,9.97465998686664e-17,0
+0be4b0ddf844b12493d29d3585329fa792f203ab,125042c,task 3 hyperparameters,720,3,9.887923813067799e-17,0
+0be4b0ddf844b12493d29d3585329fa792f203ab,125042c,task 4 retraining,90,3,9.887923813067799e-17,0
+0be4b0ddf844b12493d29d3585329fa792f203ab,125042c,task 5 isotonic,120,4,9.86623976961809e-17,0

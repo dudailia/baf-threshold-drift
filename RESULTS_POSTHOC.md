@@ -320,3 +320,26 @@ Isotonic regression maps main-study LightGBM scores to fraud probability p, fitt
 Isotonic targeting is within 0.5 points of budget in 24 of 24 variant-months (miss -0.36 to +0.16 points). On absolute miss it is smaller than label-free top 5% in 24 of 24, smaller than static in 19 (larger in 0), smaller than delayed-label lag 1 in 17 (larger in 0), and against label-free at the validation alert rate smaller in 9, larger in 9 and inconclusive in 6.
 
 Reading. Estimating each month's FPR from calibrated probabilities removes most of the overshoot that the fixed validation alert rate shows where the fraud rate falls (Variants III to V), because it does not assume the fraud rate stays at month 3's; in Base, I and II, where the validation-rate strategy was already close, it is slightly further under budget. This is post hoc and exploratory, chosen after the main results were seen, on one dataset; it is a candidate for a pre-registered test, not a finding to rank above the main study's strategies.
+
+## 6. Independent check
+
+A fresh agent that had not seen the code recomputed the stored metrics of tasks 1, 3, 4 and 5 from the saved scores with its own implementation of the definitions (its script is kept verbatim in reports/independent_check_posthoc/).
+
+| main_results_commit | check | rows_compared | metrics | max_abs_diff | mismatches |
+|---|---|---|---|---|---|
+| 125042c | task 1 rolling-origin | 960 | 3 | 0.0000 | 0 |
+| 125042c | task 3 hyperparameters | 720 | 3 | 0.0000 | 0 |
+| 125042c | task 4 retraining | 90 | 3 | 0.0000 | 0 |
+| 125042c | task 5 isotonic | 120 | 4 | 0.0000 | 0 |
+
+All 1,890 recomputed rows match, with 0 mismatches; the largest absolute difference on any metric is floating-point rounding.
+
+## 7. What changes relative to the main study
+
+Contradictions. The main study's README, one-pager and RESULTS.md say that the static threshold under-spends its budget in months 5 to 7. Post hoc, that holds when the threshold is set on month 3 or month 4, but a threshold set on month 2 over-spends in every later month (section 1): the robust finding is that a threshold set once misses its budget, by more than half a point in most later months, with a sign that depends on the validation month. The main RESULTS.md also calls the `credit_risk_score` drift "consistent with" the static misses; replacing that feature alone does not reduce them (section 2).
+
+Qualifications. The main study's statement that label-free targeting to the validation alert rate holds the budget best is true among the pre-declared strategies; post hoc, isotonic estimated-FPR targeting (section 5) is within 0.5 points in every variant-month, including where the validation-rate strategy overshoots, but it was chosen after seeing the results. Retraining with a previous-month threshold (section 4) adds TPR but not budget control.
+
+Confirmations. With the threshold set on month 3, the sign of the static miss in months 5 to 7 does not depend on the tuned configuration or on strong regularisation (section 3); label-free top 5% stays under budget and delayed-label lag 1 keeps swinging on both new splits (section 1).
+
+The main-study files, the main RESULTS.md numbers, PREDICTIONS.md and the prediction scoring are unchanged by these analyses; whether to reword the main documents in light of the contradictions above is left to the author.

@@ -209,5 +209,8 @@
 "isotonic/Variant V/miss/max": 0.0015526406363532,
 "main/independent/width_ratio_median": 1.0041543873107672,
 "main/independent/width_ratio_min": 0.8833475907586498,
-"main/independent/width_ratio_max": 1.0971181202688836
+"main/independent/width_ratio_max": 1.0971181202688836,
+"independent/max_abs_diff": 9.974659986866641e-17,
+"independent/rows": 1890,
+"independent/mismatches": 0
 }
