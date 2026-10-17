@@ -1,6 +1,6 @@
 PY := .venv/bin/python
 
-.PHONY: all clean setup test guard audit replication shuffled diagnostics train evaluate psi figures predictions values mechanism tables check sample
+.PHONY: all clean pdf setup test guard audit replication shuffled diagnostics train evaluate psi figures predictions values mechanism tables check sample
 
 # Rebuilds every number and figure from data/raw/. Each step stops on a failed test or a tripwire.
 all: test audit replication shuffled diagnostics train evaluate psi figures predictions values mechanism tables check
@@ -70,3 +70,10 @@ clean:
 	find results -mindepth 1 -maxdepth 1 ! -name independent_check.csv -exec rm -rf {} +
 	rm -f figures/*.png reports/data_audit.md reports/mechanism.md
 	rm -f RESULTS.md README.md reports/one_pager.md RESULTS_POSTHOC.md prep/call_questions.md
+
+# One-page PDF of the one-pager: pandoc (HTML) then a locally installed Chrome prints it. Not part of `make all`.
+CHROME ?= /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+pdf:
+	pandoc reports/one_pager.md -s --metadata title="" --css=docs/one_pager.css --embed-resources -o reports/one_pager.html
+	"$(CHROME)" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf=reports/one_pager.pdf reports/one_pager.html
+	rm -f reports/one_pager.html
