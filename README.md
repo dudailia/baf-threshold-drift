@@ -1,5 +1,5 @@
 # Threshold drift on the BAF dataset suite
-On all six BAF variants, a LightGBM threshold set once on month 3 at 5% FPR under-spends its budget in months 5 to 7 by 0.87 to 2.32 points of FPR.
+On the BAF suite (six variants from one generator), a LightGBM threshold set once at 5% FPR misses its budget in later months, and the direction depends on the validation month: set on month 3 it under-spends by 0.87 to 2.32 points of FPR in months 5 to 7, and post hoc, set on month 2, it over-spends (amendment in RESULTS.md).
 Re-targeting each month to the validation month's alert rate, without labels, stays within 0.5 points of 5% in 22 of 24 variant-months; the global-threshold strategies differ in age-group FPR ratio by at most 0.094 in any variant-month, and the shuffled-label sanity check failed its declared tolerance (a caveat, see RESULTS.md).
 
 This is a small study on Feedzai's public Bank Account Fraud suite (Jesus et al., NeurIPS 2022, arXiv 2211.13358). It asks how far realized FPR, TPR and alert volume drift after a threshold is set once at 5% FPR, how unevenly that falls across age groups, and which recalibration strategy keeps the alert budget on target: static, label-free (top 5% of each month, or the validation month's alert rate), delayed-label (lags 1 to 3) and an oracle that is an upper bound, not deployable.

@@ -171,6 +171,7 @@ def main():
     (OUT / "values.json").write_text(json.dumps(d, indent=0, default=float))
     # Post hoc text constants: configuration settings quoted in the write-up (not results).
     consts = sorted({v for v in REGULARISED.values() if isinstance(v, (int, float)) and not isinstance(v, bool)} | {N_DRAWS})
+    consts = sorted(set(consts) | {17})  # the day in 'Amendment 2026-10-17'
     (OUT / "manifest.json").write_text(json.dumps(dict(text_constants=consts, regularised_config=REGULARISED, main_results_commit="125042c"), indent=1))
     print(f"wrote {len(d)} values")
 

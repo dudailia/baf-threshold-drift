@@ -208,7 +208,8 @@ def main(argv):
     from src.tables import TABLES
 
     cmd = argv[1] if len(argv) > 1 else "check"
-    jobs = [(t, o, RESULTS, TABLES, True) for t, o in DOCS.items()]
+    main_dirs = [RESULTS, POSTHOC] if POSTHOC.exists() else RESULTS  # results/ takes precedence
+    jobs = [(t, o, main_dirs, TABLES, True) for t, o in DOCS.items()]
     if POSTHOC.exists():
         from src.posthoc.tables import POSTHOC_TABLES
 

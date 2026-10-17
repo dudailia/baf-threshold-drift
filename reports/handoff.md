@@ -60,3 +60,15 @@ Post hoc findings that contradict the main study so far: the sign of the static 
 Hard stops fired: none. Verified: no change since 125042c to results/, RESULTS.md, README.md, reports/one_pager.md, PREDICTIONS.md, their templates or src/predictions_eval.py; PROTOCOL.md only appended.
 
 Queue finished. Next step: the user's review of RESULTS_POSTHOC.md section 7 and a decision on whether to reword the main documents' 'under-spends' statement (left unchanged on purpose).
+
+## Revision queue (2026-10-17, authorized prose rewording)
+
+| Step | Status | Notes |
+|---|---|---|
+| 1 amendment | amendment in RESULTS.md, README headline reworded, credit_risk_score sentence reworded; one-pager reworded in step 6 | originals quoted in the amendment; git history at 125042c |
+| 2 validation month (post hoc 6) | running | src/posthoc/valmonth.py |
+| 3 isotonic control (post hoc 7) | queued after 2 | src/posthoc/fixedq.py |
+| 4 clean rebuild | to do, after text is final | make clean, make all |
+| 5 claims audit | to do | fresh subagent |
+| 6 one-pager | to do | |
+| 7 hygiene | to do | reports/hygiene.md |
