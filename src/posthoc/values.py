@@ -10,6 +10,12 @@ import pandas as pd
 
 from src.posthoc.common import OUT
 
+
+def config_root():
+    from src import config
+
+    return config.ROOT
+
 LATE = [5, 6, 7]
 
 
@@ -42,6 +48,13 @@ def build():
         _retrain(R("retrain_summary"), R("retrain_paired"), d)
     if have("isotonic_summary", "isotonic_paired"):
         _isotonic(R("isotonic_summary"), R("isotonic_paired"), d)
+    main_ic = config_root() / "results" / "independent_check.csv"
+    if main_ic.exists():
+        m = pd.read_csv(main_ic)
+        r = m[m.check.str.startswith("bootstrap width")].iloc[0]
+        d["main/independent/width_ratio_median"] = float(r.median_ratio)
+        d["main/independent/width_ratio_min"] = float(r.min_ratio)
+        d["main/independent/width_ratio_max"] = float(r.max_ratio)
     if have("independent_check"):
         ic = R("independent_check")
         d["independent/max_abs_diff"] = float(ic["max_abs_diff"].max())

@@ -123,5 +123,8 @@
 "mechanism/phone_home_valid/n_variants_in_top10": 3,
 "mechanism/credit_risk_score/shrink_m567/min": -0.0015736739454663,
 "mechanism/credit_risk_score/shrink_m567/max": 1.1873160720191069e-05,
-"mechanism/credit_risk_score/n_top_feature": 0
+"mechanism/credit_risk_score/n_top_feature": 0,
+"main/independent/width_ratio_median": 1.0041543873107672,
+"main/independent/width_ratio_min": 0.8833475907586498,
+"main/independent/width_ratio_max": 1.0971181202688836
 }
