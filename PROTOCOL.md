@@ -234,3 +234,8 @@ The tasks, as specified by the user:
 3. Hyperparameter sensitivity. Re-run the static strategy with the top 5 tuning trials, and with one deliberately strongly regularised model. Report whether the static miss changes sign or size.
 4. Retraining (exploratory). For test months 5, 6 and 7: train on months 0 to t-2, set the threshold at 5% FPR on month t-1 labels, apply to month t. Reuse the best hyperparameters from the main run with no re-tuning. Compare budget miss and TPR against the main strategies.
 5. Probability-based label-free targeting (exploratory). Calibrate scores with isotonic regression fitted on month 3 only. For each test month, choose the threshold so that estimated FPR = sum over flagged of (1 - p) divided by sum over all of (1 - p) equals 5%. Report budget miss against the other label-free strategies.
+
+Further post hoc analyses, declared 2026-10-17 after the post hoc results at commit 31d8e3d were seen (same rules as above: no change to main results, PREDICTIONS.md or the scoring; every run reported):
+
+6. Isolate the validation month. Hold the main model fixed (trained on months 0 to 2). For every pair of months (m, t) with 3 <= m < t <= 7, set the static threshold at 5% FPR on month m negatives and apply it to month t. Report the signed budget miss as one table per variant, for seed 0, with seed spread beside it, and whether the sign depends on m with the model held fixed.
+7. Control for the isotonic result. Fixed label-free rules that flag the top 5.0%, 5.25%, 5.5%, 5.75% and 6.0% of each month's applications, with budget miss reported next to the isotonic method, and a statement of how much of the isotonic result follows from the FPR identity at this prevalence.
