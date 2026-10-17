@@ -1,6 +1,6 @@
 PY := .venv/bin/python
 
-.PHONY: all setup test guard audit replication shuffled diagnostics train evaluate psi figures predictions values mechanism tables check sample
+.PHONY: all clean setup test guard audit replication shuffled diagnostics train evaluate psi figures predictions values mechanism tables check sample
 
 # Rebuilds every number and figure from data/raw/. Each step stops on a failed test or a tripwire.
 all: test audit replication shuffled diagnostics train evaluate psi figures predictions values mechanism tables check
@@ -63,3 +63,10 @@ check:
 sample: guard
 	BAF_SAMPLE=0.1 BAF_VARIANTS=Base BAF_OUT=$(CURDIR)/results/sample_run $(PY) -m src.train
 	BAF_SAMPLE=0.1 BAF_VARIANTS=Base BAF_OUT=$(CURDIR)/results/sample_run $(PY) -m src.evaluate
+
+# Removes everything `make all` regenerates. Keeps data/, results/independent_check.csv (an external audit
+# record that make all does not produce) and results_posthoc/ (post hoc analyses, not part of make all).
+clean:
+	find results -mindepth 1 -maxdepth 1 ! -name independent_check.csv -exec rm -rf {} +
+	rm -f figures/*.png reports/data_audit.md reports/mechanism.md
+	rm -f RESULTS.md README.md reports/one_pager.md RESULTS_POSTHOC.md prep/call_questions.md
