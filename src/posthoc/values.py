@@ -52,6 +52,20 @@ def build():
         _valmonth(R("valmonth_summary"), R("valmonth_ci"), d)
     if have("fixedq_summary", "fixedq_paired", "isotonic_summary"):
         _fixedq(R("fixedq_summary"), R("fixedq_paired"), R("isotonic_summary"), d)
+    ci_path = config_root() / "results" / "ci.csv"
+    if ci_path.exists():
+        ci = pd.read_csv(ci_path)
+        c = ci[(ci.model == "lightgbm") & np.isclose(ci.fpr_target, 0.05) & (ci.age_def == ">=50") & (ci.seed == 0)
+               & (ci.strategy == "static") & (ci.metric == "budget_miss") & ci.month.isin([5, 6, 7])]
+        w = c.hi - c.lo
+        _range(w, "main/static_ci_width_m567", d)
+        d["main/static_ci_halfwidth_m567/max"] = float(w.max() / 2)
+    sm_path = config_root() / "results" / "summary.csv"
+    if sm_path.exists():
+        sm = pd.read_csv(sm_path)
+        x = sm[(sm.model == "lightgbm") & np.isclose(sm.fpr_target, 0.05) & (sm.age_def == ">=50") & (sm.strategy == "static")
+               & (sm.metric == "budget_miss") & sm.month.isin([5, 6, 7])]
+        d["main/static_seed_sd_m567/max"] = float(x.sd.max())
     psi_path = config_root() / "results" / "psi.csv"
     if psi_path.exists():
         ps = pd.read_csv(psi_path)

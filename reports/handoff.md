@@ -80,4 +80,4 @@ Queue finished. Next step: the user's review of RESULTS_POSTHOC.md section 7 and
 | 1 relative paths | done | four checker scripts; post hoc checker rerun, 0 mismatches |
 | 2 fresh-clone test | to do | |
 | 3 second claims audit | to do | after step 4 text |
-| 4 limits, data origin, interval widths | to do | |
+| 4 limits, data origin, interval widths | done | Kaggle description and datasheet A6, A14 quoted; static CI widths 0.23 to 0.32 pt next to the 0.87 to 2.32 pt range; one-pager about one page |
