@@ -47,3 +47,23 @@ Variant V.
 The other variants are in results_posthoc/mechanism_features.csv. Across all variants, features and months 5 to 7, the mean shrink is positive in {{value:mechanism/n_mean_shrink_positive_m567|int}} of {{value:mechanism/n_cells_m567|int}} cells and every draw shrinks the miss in {{value:mechanism/n_all_draws_shrink_m567|int}}; the largest mean shrink is {{value:mechanism/max_shrink_m567|apt2}} points (`{{value:mechanism/max_shrink_feature|str}}`, {{value:mechanism/max_shrink_variant|str}}, month {{value:mechanism/max_shrink_month|int}}) against main-study static misses of {{value:derived/static/miss_m567/max|apt2}} to {{value:derived/static/miss_m567/min|apt2}} points in months 5 to 7. Replacing `credit_risk_score`, the feature with the largest population stability index in the main study, changes the miss by {{value:mechanism/credit_risk_score/shrink_m567/min|pt2}} to {{value:mechanism/credit_risk_score/shrink_m567/max|pt2}} points, and replacing `housing_status` widens it by {{value:mechanism/housing_status/shrink_m567_by_variant/max|apt2}} to {{value:mechanism/housing_status/shrink_m567_by_variant/min|apt2}} points on average per variant.
 
 Reading. This is a null result for single features: no one feature among the top 10, replaced on its own, accounts for the negatives' score drift. One-at-a-time replacement breaks the joint distribution of the features, so it can widen the miss (as for `housing_status`), and drift spread over several features or carried by their joint distribution would not show up here. It also qualifies the main RESULTS.md sentence that the `credit_risk_score` drift is "consistent with" the static misses: that feature's drift, replaced alone, does not explain them.
+
+## 3. Hyperparameter sensitivity
+
+Static strategy on the main split for the 5 tuning trials with the highest validation TPR (rank 1 is the main study's model) and one strongly regularised configuration (200 trees, depth 3, 8 leaves, at least 2,000 rows per leaf), 5 seeds each; the last columns compare each configuration's absolute miss with rank 1 on the same resampled rows (seed 0).
+
+Base.
+
+{{table:hyper|Base}}
+
+Variant III.
+
+{{table:hyper|Variant III}}
+
+Variant V.
+
+{{table:hyper|Variant V}}
+
+The other variants are in results_posthoc/hyper_summary.csv and hyper_paired.csv. In months 5 to 7 the static miss keeps its sign in every configuration and variant ({{value:hyper/n_sign_change_m567|int}} sign changes in {{value:hyper/n_cells_m567|int}} cells), ranging from {{value:hyper/static_miss_m567/min|pt2}} to {{value:hyper/static_miss_m567/max|pt2}} points; the only sign changes ({{value:hyper/n_sign_change|int}} of {{value:hyper/n_cells|int}} cells over months 4 to 7) are in month 4, where every configuration is within one point of budget. The largest change against rank 1 is {{value:hyper/max_abs_change|apt2}} points. Against rank 1 on absolute miss, the other tuned configurations are smaller in {{value:hyper/vs/tuned/n_differs_smaller|int}}, larger in {{value:hyper/vs/tuned/n_differs_larger|int}} and inconclusive in {{value:hyper/vs/tuned/n_inconclusive|int}} of {{value:hyper/vs/tuned/n|int}} cells; the regularised model is smaller in {{value:hyper/vs/regularised/n_differs_smaller|int}}, larger in {{value:hyper/vs/regularised/n_differs_larger|int}} and inconclusive in {{value:hyper/vs/regularised/n_inconclusive|int}} of {{value:hyper/vs/regularised/n|int}}.
+
+Reading. With the threshold set on month 3, the static under-spend does not depend on the tuned configuration or on strong regularisation: its sign is stable and its size changes by up to about a point. Among the tuned configurations, rank 1 (the main model) tends to have one of the larger misses (the others are significantly smaller far more often than larger), so the main study's size estimate sits toward the upper end of what other tuned configurations give.

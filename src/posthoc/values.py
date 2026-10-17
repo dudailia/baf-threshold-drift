@@ -164,8 +164,14 @@ def _isotonic(i_s, ip, d):
 
 
 def main():
+    from src.posthoc.hyper import REGULARISED
+    from src.posthoc.mechanism import N_DRAWS
+
     d = build()
     (OUT / "values.json").write_text(json.dumps(d, indent=0, default=float))
+    # Post hoc text constants: configuration settings quoted in the write-up (not results).
+    consts = sorted({v for v in REGULARISED.values() if isinstance(v, (int, float)) and not isinstance(v, bool)} | {N_DRAWS})
+    (OUT / "manifest.json").write_text(json.dumps(dict(text_constants=consts, regularised_config=REGULARISED, main_results_commit="125042c"), indent=1))
     print(f"wrote {len(d)} values")
 
 

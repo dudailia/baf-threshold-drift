@@ -1,0 +1,22 @@
+{
+ "text_constants": [
+  0.05,
+  3,
+  5,
+  8,
+  200,
+  255,
+  2000
+ ],
+ "regularised_config": {
+  "n_estimators": 200,
+  "max_depth": 3,
+  "learning_rate": 0.05,
+  "num_leaves": 8,
+  "boosting": "gbdt",
+  "min_data_in_leaf": 2000,
+  "max_bin": 255,
+  "enable_bundle": true
+ },
+ "main_results_commit": "125042c"
+}

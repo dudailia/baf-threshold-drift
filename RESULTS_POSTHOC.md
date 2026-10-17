@@ -161,3 +161,98 @@ Variant V.
 The other variants are in results_posthoc/mechanism_features.csv. Across all variants, features and months 5 to 7, the mean shrink is positive in 43 of 180 cells and every draw shrinks the miss in 30; the largest mean shrink is 0.48 points (`phone_home_valid`, Variant I, month 5) against main-study static misses of 0.87 to 2.32 points in months 5 to 7. Replacing `credit_risk_score`, the feature with the largest population stability index in the main study, changes the miss by -0.16 to +0.00 points, and replacing `housing_status` widens it by 0.41 to 0.63 points on average per variant.
 
 Reading. This is a null result for single features: no one feature among the top 10, replaced on its own, accounts for the negatives' score drift. One-at-a-time replacement breaks the joint distribution of the features, so it can widen the miss (as for `housing_status`), and drift spread over several features or carried by their joint distribution would not show up here. It also qualifies the main RESULTS.md sentence that the `credit_risk_score` drift is "consistent with" the static misses: that feature's drift, replaced alone, does not explain them.
+
+## 3. Hyperparameter sensitivity
+
+Static strategy on the main split for the 5 tuning trials with the highest validation TPR (rank 1 is the main study's model) and one strongly regularised configuration (200 trees, depth 3, 8 leaves, at least 2,000 rows per leaf), 5 seeds each; the last columns compare each configuration's absolute miss with rank 1 on the same resampled rows (seed 0).
+
+Base.
+
+| Configuration | Month | Static realized FPR %, seed mean (sd; min to max) | Static budget miss pt, seed 0 [95% CI] | Static TPR %, seed mean | Absolute miss vs rank 1, seed 0 [paired 95% CI] | Verdict |
+|---|---|---|---|---|---|---|
+| rank 1 (trial 3) | 4 | 5.08 (0.02; 5.05 to 5.10) | +0.05 [-0.11, +0.22] | 57.2 | reference |  |
+| rank 1 (trial 3) | 5 | 3.08 (0.02; 3.06 to 3.10) | -1.90 [-2.02, -1.78] | 44.2 | reference |  |
+| rank 1 (trial 3) | 6 | 4.02 (0.04; 3.96 to 4.05) | -1.04 [-1.20, -0.89] | 46.6 | reference |  |
+| rank 1 (trial 3) | 7 | 2.99 (0.08; 2.90 to 3.11) | -2.10 [-2.21, -1.97] | 44.7 | reference |  |
+| rank 2 (trial 8) | 4 | 5.21 (0.04; 5.15 to 5.25) | +0.20 [+0.04, +0.38] | 58.0 | +0.15 [-0.06, +0.24] | inconclusive |
+| rank 2 (trial 8) | 5 | 3.22 (0.04; 3.16 to 3.26) | -1.81 [-1.94, -1.68] | 46.0 | -0.09 [-0.16, -0.01] | inconclusive |
+| rank 2 (trial 8) | 6 | 4.06 (0.07; 3.93 to 4.12) | -0.94 [-1.11, -0.80] | 47.4 | -0.09 [-0.17, -0.00] | inconclusive |
+| rank 2 (trial 8) | 7 | 3.18 (0.04; 3.12 to 3.23) | -1.88 [-2.00, -1.74] | 47.8 | -0.22 [-0.30, -0.15] | differs |
+| rank 3 (trial 11) | 4 | 5.30 (0.05; 5.24 to 5.35) | +0.29 [+0.12, +0.46] | 57.4 | +0.24 [+0.02, +0.34] | differs |
+| rank 3 (trial 11) | 5 | 3.33 (0.03; 3.30 to 3.38) | -1.67 [-1.80, -1.54] | 45.6 | -0.23 [-0.32, -0.15] | differs |
+| rank 3 (trial 11) | 6 | 4.12 (0.05; 4.06 to 4.18) | -0.85 [-1.00, -0.70] | 47.5 | -0.19 [-0.29, -0.10] | differs |
+| rank 3 (trial 11) | 7 | 3.39 (0.02; 3.36 to 3.42) | -1.60 [-1.75, -1.45] | 48.2 | -0.50 [-0.59, -0.39] | differs |
+| rank 4 (trial 17) | 4 | 5.16 (0.05; 5.13 to 5.22) | +0.22 [+0.03, +0.39] | 56.8 | +0.17 [-0.07, +0.25] | inconclusive |
+| rank 4 (trial 17) | 5 | 3.26 (0.07; 3.18 to 3.35) | -1.65 [-1.79, -1.50] | 45.4 | -0.26 [-0.33, -0.17] | differs |
+| rank 4 (trial 17) | 6 | 4.16 (0.03; 4.12 to 4.20) | -0.80 [-0.97, -0.66] | 47.7 | -0.24 [-0.32, -0.14] | differs |
+| rank 4 (trial 17) | 7 | 3.11 (0.11; 2.96 to 3.26) | -1.88 [-2.01, -1.75] | 45.4 | -0.22 [-0.30, -0.14] | differs |
+| rank 5 (trial 2) | 4 | 5.14 (0.05; 5.09 to 5.21) | +0.21 [+0.03, +0.41] | 56.5 | +0.17 [-0.07, +0.26] | inconclusive |
+| rank 5 (trial 2) | 5 | 3.21 (0.04; 3.17 to 3.27) | -1.81 [-1.95, -1.67] | 44.4 | -0.09 [-0.18, -0.01] | inconclusive |
+| rank 5 (trial 2) | 6 | 4.04 (0.06; 3.98 to 4.11) | -0.98 [-1.15, -0.81] | 45.6 | -0.06 [-0.16, +0.04] | inconclusive |
+| rank 5 (trial 2) | 7 | 2.95 (0.12; 2.84 to 3.14) | -2.12 [-2.24, -1.97] | 44.5 | +0.02 [-0.07, +0.10] | inconclusive |
+| strongly regularised | 4 | 5.18 (0.04; 5.13 to 5.23) | +0.23 [+0.03, +0.40] | 57.3 | +0.18 [-0.06, +0.26] | inconclusive |
+| strongly regularised | 5 | 3.13 (0.02; 3.09 to 3.15) | -1.85 [-2.00, -1.73] | 45.5 | -0.05 [-0.12, +0.05] | inconclusive |
+| strongly regularised | 6 | 3.84 (0.03; 3.79 to 3.88) | -1.12 [-1.29, -0.96] | 46.5 | +0.08 [-0.02, +0.20] | inconclusive |
+| strongly regularised | 7 | 3.05 (0.04; 3.00 to 3.09) | -1.92 [-2.05, -1.78] | 46.9 | -0.18 [-0.27, -0.08] | differs |
+
+Variant III.
+
+| Configuration | Month | Static realized FPR %, seed mean (sd; min to max) | Static budget miss pt, seed 0 [95% CI] | Static TPR %, seed mean | Absolute miss vs rank 1, seed 0 [paired 95% CI] | Verdict |
+|---|---|---|---|---|---|---|
+| rank 1 (trial 3) | 4 | 5.14 (0.04; 5.10 to 5.18) | +0.12 [-0.05, +0.29] | 75.1 | reference |  |
+| rank 1 (trial 3) | 5 | 3.25 (0.06; 3.18 to 3.33) | -1.73 [-1.85, -1.60] | 70.3 | reference |  |
+| rank 1 (trial 3) | 6 | 4.11 (0.04; 4.06 to 4.17) | -0.89 [-1.04, -0.75] | 73.4 | reference |  |
+| rank 1 (trial 3) | 7 | 2.68 (0.06; 2.58 to 2.73) | -2.31 [-2.41, -2.18] | 65.7 | reference |  |
+| rank 2 (trial 2) | 4 | 5.19 (0.06; 5.11 to 5.27) | +0.21 [+0.03, +0.38] | 74.6 | +0.09 [-0.03, +0.20] | inconclusive |
+| rank 2 (trial 2) | 5 | 3.41 (0.10; 3.24 to 3.50) | -1.57 [-1.71, -1.45] | 70.3 | -0.16 [-0.24, -0.07] | differs |
+| rank 2 (trial 2) | 6 | 4.17 (0.14; 3.97 to 4.29) | -0.76 [-0.93, -0.61] | 72.4 | -0.13 [-0.23, -0.01] | inconclusive |
+| rank 2 (trial 2) | 7 | 3.48 (0.15; 3.25 to 3.64) | -1.43 [-1.58, -1.30] | 68.7 | -0.87 [-0.97, -0.76] | differs |
+| rank 3 (trial 8) | 4 | 5.25 (0.02; 5.23 to 5.28) | +0.26 [+0.08, +0.43] | 75.3 | +0.14 [+0.01, +0.24] | inconclusive |
+| rank 3 (trial 8) | 5 | 3.38 (0.05; 3.33 to 3.45) | -1.58 [-1.72, -1.45] | 70.5 | -0.15 [-0.22, -0.07] | differs |
+| rank 3 (trial 8) | 6 | 4.07 (0.06; 4.01 to 4.14) | -0.86 [-1.01, -0.70] | 73.2 | -0.03 [-0.14, +0.05] | inconclusive |
+| rank 3 (trial 8) | 7 | 3.56 (0.04; 3.51 to 3.60) | -1.48 [-1.63, -1.34] | 69.6 | -0.83 [-0.92, -0.73] | differs |
+| rank 4 (trial 14) | 4 | 5.33 (0.02; 5.31 to 5.36) | +0.32 [+0.15, +0.47] | 74.5 | +0.19 [+0.07, +0.29] | differs |
+| rank 4 (trial 14) | 5 | 3.47 (0.05; 3.40 to 3.53) | -1.60 [-1.72, -1.48] | 70.3 | -0.13 [-0.21, -0.04] | inconclusive |
+| rank 4 (trial 14) | 6 | 4.19 (0.06; 4.11 to 4.27) | -0.89 [-1.03, -0.75] | 72.7 | +0.00 [-0.10, +0.10] | inconclusive |
+| rank 4 (trial 14) | 7 | 3.51 (0.07; 3.46 to 3.63) | -1.52 [-1.66, -1.39] | 68.8 | -0.79 [-0.87, -0.68] | differs |
+| rank 5 (trial 11) | 4 | 5.24 (0.06; 5.17 to 5.30) | +0.23 [+0.08, +0.40] | 74.5 | +0.11 [-0.01, +0.23] | inconclusive |
+| rank 5 (trial 11) | 5 | 3.44 (0.05; 3.38 to 3.50) | -1.62 [-1.74, -1.49] | 69.6 | -0.11 [-0.20, -0.02] | inconclusive |
+| rank 5 (trial 11) | 6 | 4.19 (0.07; 4.12 to 4.30) | -0.85 [-0.99, -0.71] | 72.5 | -0.04 [-0.14, +0.06] | inconclusive |
+| rank 5 (trial 11) | 7 | 3.99 (0.06; 3.92 to 4.07) | -1.06 [-1.21, -0.92] | 70.3 | -1.25 [-1.35, -1.13] | differs |
+| strongly regularised | 4 | 5.13 (0.06; 5.03 to 5.21) | +0.03 [-0.14, +0.20] | 73.8 | -0.09 [-0.19, +0.11] | inconclusive |
+| strongly regularised | 5 | 3.30 (0.06; 3.21 to 3.37) | -1.79 [-1.92, -1.67] | 68.6 | +0.06 [-0.03, +0.17] | inconclusive |
+| strongly regularised | 6 | 3.94 (0.07; 3.84 to 4.01) | -1.16 [-1.30, -1.02] | 70.8 | +0.27 [+0.16, +0.38] | differs |
+| strongly regularised | 7 | 3.59 (0.09; 3.46 to 3.70) | -1.54 [-1.68, -1.40] | 68.5 | -0.77 [-0.87, -0.65] | differs |
+
+Variant V.
+
+| Configuration | Month | Static realized FPR %, seed mean (sd; min to max) | Static budget miss pt, seed 0 [95% CI] | Static TPR %, seed mean | Absolute miss vs rank 1, seed 0 [paired 95% CI] | Verdict |
+|---|---|---|---|---|---|---|
+| rank 1 (trial 8) | 4 | 5.12 (0.05; 5.06 to 5.18) | +0.08 [-0.09, +0.24] | 75.5 | reference |  |
+| rank 1 (trial 8) | 5 | 3.41 (0.03; 3.37 to 3.44) | -1.63 [-1.76, -1.52] | 69.6 | reference |  |
+| rank 1 (trial 8) | 6 | 3.88 (0.08; 3.80 to 3.98) | -1.15 [-1.28, -1.02] | 30.2 | reference |  |
+| rank 1 (trial 8) | 7 | 3.86 (0.16; 3.72 to 4.13) | -1.18 [-1.33, -1.04] | 29.9 | reference |  |
+| rank 2 (trial 3) | 4 | 5.11 (0.03; 5.09 to 5.15) | +0.15 [-0.02, +0.31] | 75.6 | +0.08 [-0.07, +0.17] | inconclusive |
+| rank 2 (trial 3) | 5 | 3.52 (0.04; 3.48 to 3.58) | -1.52 [-1.65, -1.39] | 69.8 | -0.11 [-0.20, -0.04] | inconclusive |
+| rank 2 (trial 3) | 6 | 4.17 (0.08; 4.08 to 4.27) | -0.89 [-1.03, -0.74] | 30.7 | -0.26 [-0.35, -0.18] | differs |
+| rank 2 (trial 3) | 7 | 4.65 (0.15; 4.55 to 4.91) | -0.44 [-0.64, -0.28] | 30.8 | -0.74 [-0.83, -0.61] | differs |
+| rank 3 (trial 2) | 4 | 5.08 (0.08; 5.01 to 5.21) | +0.02 [-0.13, +0.18] | 74.5 | -0.05 [-0.14, +0.08] | inconclusive |
+| rank 3 (trial 2) | 5 | 3.44 (0.08; 3.36 to 3.56) | -1.61 [-1.72, -1.48] | 68.6 | -0.02 [-0.11, +0.05] | inconclusive |
+| rank 3 (trial 2) | 6 | 4.04 (0.07; 3.98 to 4.15) | -1.02 [-1.15, -0.88] | 29.6 | -0.13 [-0.22, -0.04] | differs |
+| rank 3 (trial 2) | 7 | 4.02 (0.15; 3.85 to 4.25) | -1.15 [-1.30, -1.01] | 28.9 | -0.03 [-0.14, +0.06] | inconclusive |
+| rank 4 (trial 11) | 4 | 5.13 (0.03; 5.09 to 5.17) | +0.09 [-0.06, +0.26] | 74.7 | +0.02 [-0.07, +0.10] | inconclusive |
+| rank 4 (trial 11) | 5 | 3.41 (0.03; 3.37 to 3.45) | -1.63 [-1.75, -1.49] | 68.8 | -0.00 [-0.08, +0.06] | inconclusive |
+| rank 4 (trial 11) | 6 | 3.96 (0.07; 3.88 to 4.04) | -1.12 [-1.25, -0.97] | 29.8 | -0.04 [-0.11, +0.04] | inconclusive |
+| rank 4 (trial 11) | 7 | 3.81 (0.06; 3.74 to 3.90) | -1.22 [-1.37, -1.08] | 28.5 | +0.04 [-0.05, +0.13] | inconclusive |
+| rank 5 (trial 17) | 4 | 5.16 (0.04; 5.10 to 5.21) | +0.17 [-0.01, +0.33] | 74.8 | +0.09 [-0.06, +0.18] | inconclusive |
+| rank 5 (trial 17) | 5 | 3.52 (0.07; 3.43 to 3.58) | -1.52 [-1.64, -1.39] | 68.7 | -0.11 [-0.20, -0.04] | differs |
+| rank 5 (trial 17) | 6 | 4.11 (0.12; 3.91 to 4.21) | -0.84 [-0.99, -0.69] | 31.4 | -0.32 [-0.40, -0.22] | differs |
+| rank 5 (trial 17) | 7 | 4.28 (0.21; 4.04 to 4.55) | -0.60 [-0.76, -0.43] | 30.7 | -0.59 [-0.70, -0.48] | differs |
+| strongly regularised | 4 | 5.05 (0.06; 4.95 to 5.12) | +0.05 [-0.12, +0.22] | 73.5 | -0.02 [-0.12, +0.08] | inconclusive |
+| strongly regularised | 5 | 3.26 (0.02; 3.23 to 3.30) | -1.75 [-1.87, -1.63] | 67.6 | +0.12 [+0.04, +0.20] | inconclusive |
+| strongly regularised | 6 | 3.70 (0.04; 3.66 to 3.74) | -1.34 [-1.47, -1.21] | 31.9 | +0.18 [+0.10, +0.27] | differs |
+| strongly regularised | 7 | 3.27 (0.10; 3.20 to 3.43) | -1.78 [-1.89, -1.66] | 31.0 | +0.59 [+0.50, +0.69] | differs |
+
+The other variants are in results_posthoc/hyper_summary.csv and hyper_paired.csv. In months 5 to 7 the static miss keeps its sign in every configuration and variant (0 sign changes in 90 cells), ranging from -2.16 to -0.35 points; the only sign changes (3 of 120 cells over months 4 to 7) are in month 4, where every configuration is within one point of budget. The largest change against rank 1 is 1.31 points. Against rank 1 on absolute miss, the other tuned configurations are smaller in 31, larger in 4 and inconclusive in 61 of 96 cells; the regularised model is smaller in 2, larger in 4 and inconclusive in 18 of 24.
+
+Reading. With the threshold set on month 3, the static under-spend does not depend on the tuned configuration or on strong regularisation: its sign is stable and its size changes by up to about a point. Among the tuned configurations, rank 1 (the main model) tends to have one of the larger misses (the others are significantly smaller far more often than larger), so the main study's size estimate sits toward the upper end of what other tuned configurations give.

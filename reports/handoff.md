@@ -49,8 +49,8 @@ Everything here is post hoc (PROTOCOL.md, "Post hoc analyses"). Outputs: results
 | setup | done (25e8629) | PROTOCOL.md section, reports/decisions.md | |
 | 1 rolling-origin | done | src/posthoc/rolling.py | rolling_*.csv. Split A (validate on month 2): static OVER budget in all 18 cells of months 5-7 (CI above 0), contradicting the main under-spend; split B (validate on month 4): under budget in 18 of 18, as in the main study. |
 | 2 mechanism | done | src/posthoc/mechanism.py | mechanism_*.csv. Refit exact. KS small; replacing any single top-10 feature with month-3 draws does not shrink the static miss except phone_home_valid slightly; credit_risk_score replacement does not shrink it (weakens a main RESULTS.md 'consistent with' sentence). |
-| 3 hyperparameters | running (log results_posthoc/logs/hyper.log) | src/posthoc/hyper.py | hyper_*.csv |
-| 4 retraining | queued | src/posthoc/retrain.py | retrain_*.csv |
+| 3 hyperparameters | done | src/posthoc/hyper.py | hyper_*.csv. Static miss in months 5-7 negative for every configuration (0 sign changes in 90 cells); size -0.35 to -2.16 pt; 3 sign changes in month 4 only. |
+| 4 retraining | running (log results_posthoc/logs/retrain.log) | src/posthoc/retrain.py | retrain_*.csv |
 | 5 isotonic | queued | src/posthoc/isotonic.py | isotonic_*.csv |
 | 6 call prep | drafted, renders once tasks 3 and 4 values exist | docs/call_questions.template.md | prep/call_questions.md |
 | 7 independent check | brief drafted in the scratchpad (independent_check_posthoc_prompt.md); launch after task 5 | fresh subagent | results_posthoc/independent_check.csv |
