@@ -131,7 +131,7 @@ def _metrics(C, J, target):
     return out
 
 
-def _evaluate_pass(data, W, targets, primary_age):
+def _evaluate_pass(data, W, targets, primary_age, validation_month=VALIDATION_MONTH):
     """One weight matrix per month -> {(strategy, month, target): {age: {metric: array}}}, plus thresholds."""
     old_dec = AGE_DEFS[primary_age]
     groups = {"young": tuple(a for a in range(3) if a not in old_dec), "old": old_dec}
@@ -146,22 +146,22 @@ def _evaluate_pass(data, W, targets, primary_age):
         for f in targets:
             j_or = _cut(N, f * _total(N))
             oracle_t[(m, f)] = md.threshold_from_cut(j_or)
-            if m == VALIDATION_MONTH:
+            if m == validation_month:
                 static_rate[f] = _div(T[np.arange(B), j_or].astype(np.float64), _total(T))
                 for gname, bins in groups.items():
                     Ng = _neg(C, bins)
                     gw_static_t[(f, gname)] = md.threshold_from_cut(_cut(Ng, f * _total(Ng)))
                 continue
             plans = {}
-            t_static = oracle_t[(VALIDATION_MONTH, f)]
-            plans["static"] = (md.count_at_or_above(t_static), t_static, VALIDATION_MONTH)
+            t_static = oracle_t[(validation_month, f)]
+            plans["static"] = (md.count_at_or_above(t_static), t_static, validation_month)
             j = _cut(T, f * _total(T))
             plans["label_free_top"] = (j, md.threshold_from_cut(j), m)
             j = _cut(T, static_rate[f] * _total(T))
             plans["label_free_val_rate"] = (j, md.threshold_from_cut(j), m)
             for k in LAGS:
                 src = m - k
-                if src >= VALIDATION_MONTH:
+                if src >= validation_month:
                     t = oracle_t[(src, f)]
                     plans[f"delayed_lag{k}"] = (md.count_at_or_above(t), t, src)
                 else:
@@ -177,7 +177,7 @@ def _evaluate_pass(data, W, targets, primary_age):
                         jg = _cut(Tg, f * _total(Tg))
                     for a in bins:
                         J[a] = jg
-                plans[name] = (J, np.full(B, np.nan), VALIDATION_MONTH if name == "groupwise_static" else m)
+                plans[name] = (J, np.full(B, np.nan), validation_month if name == "groupwise_static" else m)
             for strategy, plan in plans.items():
                 if plan is None:
                     results[(strategy, m, f)] = None
@@ -189,7 +189,8 @@ def _evaluate_pass(data, W, targets, primary_age):
     return results, thresholds
 
 
-def evaluate_months(months, targets, primary_age, n_boot, weight_seed=None, weights=None, boot_targets=None):
+def evaluate_months(months, targets, primary_age, n_boot, weight_seed=None, weights=None, boot_targets=None,
+                    validation_month=VALIDATION_MONTH):
     """months: {month: (scores, labels, ages)} with the validation month and test months.
 
     Bootstrap runs on ``boot_targets`` (default: all targets). Returns (point_rows, boot) where boot maps (strategy, month, target, age_def)
@@ -197,7 +198,7 @@ def evaluate_months(months, targets, primary_age, n_boot, weight_seed=None, weig
     """
     data = {m: _Month(*months[m]) for m in sorted(months)}
     W = weights or {m: np.ones((1, d.n)) for m, d in data.items()}
-    res, thr = _evaluate_pass(data, W, targets, primary_age)
+    res, thr = _evaluate_pass(data, W, targets, primary_age, validation_month)
     metric_names = list(next(r for r in res.values() if r is not None)[primary_age])
     point = []
     for (strategy, m, f), r in sorted(res.items(), key=lambda kv: (STRATEGIES.index(kv[0][0]), kv[0][1], kv[0][2])):
@@ -217,7 +218,7 @@ def evaluate_months(months, targets, primary_age, n_boot, weight_seed=None, weig
         for c0 in range(0, n_boot, CHUNK):
             b = min(CHUNK, n_boot - c0)
             Wb = {m: resample_weights(d.n, CHUNK, (weight_seed, m, c0))[:b] for m, d in data.items()}
-            res_b, _ = _evaluate_pass(data, Wb, boot_targets or targets, primary_age)
+            res_b, _ = _evaluate_pass(data, Wb, boot_targets or targets, primary_age, validation_month)
             for (strategy, m, f), r in res_b.items():
                 if r is None:
                     continue

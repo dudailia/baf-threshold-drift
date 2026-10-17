@@ -130,3 +130,27 @@ def test_bootstrap_intervals_cover_point_estimate(months):
 
 def test_age_bins_cover_decades():
     assert AGE_BINS(np.array([10, 40, 50, 60, 90])).tolist() == [0, 0, 1, 2, 2]
+
+
+def test_shifted_validation_month_matches_simple_functions():
+    """Post hoc rolling-origin splits use another validation month (here 2, tests 3 to 7)."""
+    rng = np.random.default_rng(5)
+    months = {m: _month(rng, 2000, shift=0.2 * (m >= 5)) for m in range(2, 8)}
+    point, _ = evaluate_months(months, [0.05], primary_age=">=50", n_boot=0, validation_month=2)
+    sv, yv, _ = months[2]
+    t_static = threshold_at_fpr(sv, yv, 0.05)
+    for r in point:
+        if r["age_def"] != ">=50" or r["strategy"] not in ("static", "delayed_lag1", "oracle"):
+            continue
+        s, y, _ = months[r["month"]]
+        if r["strategy"] == "static":
+            t = t_static
+        elif r["strategy"] == "delayed_lag1":
+            src = months[r["month"] - 1]
+            t = threshold_at_fpr(src[0], src[1], 0.05)
+        else:
+            t = threshold_at_fpr(s, y, 0.05)
+        assert r["realized_fpr"] == pytest.approx(flag(s[y == 0], t).mean(), abs=1e-12)
+        assert r["tpr"] == pytest.approx(flag(s[y == 1], t).mean(), abs=1e-12)
+    na = {(r["strategy"], r["month"]) for r in point if not r["available"]}
+    assert na == {("delayed_lag2", 3), ("delayed_lag3", 3), ("delayed_lag3", 4)}
