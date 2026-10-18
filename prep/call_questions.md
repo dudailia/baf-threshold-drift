@@ -8,7 +8,7 @@ A strong answer says that the paper's operating point is the oracle here, on poo
 
 ## 2. Your shuffled-label check failed. Why trust any number?
 
-It must concede the failure plainly: pooled TPR 0.117 against the declared 0.05 plus or minus 0.02, with the criterion not redefined. Then the evidence against a leak: 20 shuffles give a LightGBM median of 0.059 (the original was the maximum) and a logistic regression range of 0.026 to 0.069; a label-free density score alone reaches 0.083; the leak audit flags 0 features; a unit test confirms that every fit uses training months only; and an independent recomputation matched every stored metric. The honest conclusion is that a wrong null (fraud applications are atypical) is one possible explanation, not established, since the median shuffle was inside the tolerance; the check did not pass.
+It must concede the failure plainly: pooled TPR 0.117 at 5% FPR against the declared 0.05 plus or minus 0.02, with the criterion not redefined. Then the evidence against a leak: 20 shuffles give a LightGBM median of 0.059 (the original was the maximum) and a logistic regression range of 0.026 to 0.069; a label-free density score alone reaches 0.083; the leak audit flags 0 features; a unit test confirms that every fit uses training months only; and an independent recomputation matched every stored metric. The honest conclusion is that a wrong null (fraud applications are atypical) is one possible explanation, not established, since the median shuffle was inside the tolerance; the check did not pass.
 
 ## 3. Is the static under-spend real, or an artefact of month 3?
 

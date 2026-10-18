@@ -1,6 +1,7 @@
 """Figures built from saved predictions and thresholds."""
 
 import numpy as np
+from matplotlib.ticker import MultipleLocator
 from sklearn.metrics import roc_curve
 
 from src.metrics import confusion, rates
@@ -42,18 +43,19 @@ def plot_roc_operating_points(curves, points, path, max_fpr=0.15, title=None):
                         markeredgecolor=color, markeredgewidth=1.6, markersize=9, label=LABELS.get(strategy, strategy))
             panel_points = [xy[0] for (v, m, _), xy in coords.items() if (v, m) == (variant, month)]
             ax.set_xlim(0, max([max_fpr] + [1.1 * x for x in panel_points]))
+            ax.xaxis.set_major_locator(MultipleLocator(0.05))
             ax.set_title(f"{variant}, month {month}", fontsize=9)
             if i == len(variants) - 1:
-                ax.set_xlabel("FPR")
+                ax.set_xlabel("FPR (share of negatives)")
             if j == 0:
-                ax.set_ylabel("TPR")
+                ax.set_ylabel("TPR (share of positives)")
     handles, labels = [], []
     for ax in axes.ravel():
         for h, lab in zip(*ax.get_legend_handles_labels()):
             if lab not in labels:
                 handles.append(h)
                 labels.append(lab)
-    fig.legend(handles, labels, loc="lower center", ncol=min(len(labels), 4))
+    fig.legend(handles, labels, loc="lower center", ncol=min(len(labels), 3))
     if title:
         fig.suptitle(title, fontsize=10)
     fig.tight_layout(rect=(0, 0.06, 1, 0.97 if title else 1))
