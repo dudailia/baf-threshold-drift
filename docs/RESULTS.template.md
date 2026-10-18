@@ -28,7 +28,7 @@ Replication of the paper's setup on Base (train months 0 to 5, test months 6 and
 
 With `month` as a feature, as in the paper's code, the mean TPR of the 5 best configurations is {{value:check/replication/with_month/top5_mean_tpr|f3}} with FPR ratio {{value:check/replication/with_month/top5_mean_fpr_ratio|f3}}, inside the loose bound of 0.5 to 0.6 around the Figure 1 reading; without `month` it is {{value:check/replication/without_month/top5_mean_tpr|f3}}.
 
-Shuffled-label check: FAILED. A LightGBM model trained on Base with labels shuffled within months 0 to 2 reached a pooled TPR of {{value:check/shuffled/4-7 pooled/oracle_tpr|f3}} at 5% FPR on months 4 to 7, outside the declared 0.05 plus or minus 0.02. The tripwire fired and the criterion was not redefined.
+Shuffled-label check: FAILED. A LightGBM model trained on Base with labels permuted across the pooled rows of months 0 to 2 reached a pooled TPR of {{value:check/shuffled/4-7 pooled/oracle_tpr|f3}} at 5% FPR on months 4 to 7, outside the declared 0.05 plus or minus 0.02. The tripwire fired and the criterion was not redefined.
 
 {{table:csv|shuffled}}
 
@@ -70,7 +70,7 @@ With the threshold set on month 3, static is within {{value:derived/static/miss_
 
 Label-free top 5% sits {{value:derived/label_free_top/miss_all/max|apt2}} to {{value:derived/label_free_top/miss_all/min|apt2}} points under budget in every variant-month because frauds take part of a fixed 5% of alerts, and delayed-label lag 1 swings from {{value:derived/delayed_lag1/miss_all/min|pt2}} to {{value:derived/delayed_lag1/miss_all/max|pt2}} points, consistent with month-to-month score shifts that do not persist.
 
-Against static on absolute budget miss, label-free at the validation alert rate is smaller in {{value:derived/label_free_val_rate/vs_static/n_differs_smaller|int}} variant-months, inconclusive in {{value:derived/label_free_val_rate/vs_static/n_inconclusive|int}} and larger in {{value:derived/label_free_val_rate/vs_static/n_differs_larger|int}}; delayed-label lag 1 is smaller in {{value:derived/delayed_lag1/vs_static/n_differs_smaller|int}}, inconclusive in {{value:derived/delayed_lag1/vs_static/n_inconclusive|int}} and larger in {{value:derived/delayed_lag1/vs_static/n_differs_larger|int}}.
+Against static on absolute budget miss, label-free at the validation alert rate is smaller in {{value:derived/label_free_val_rate/vs_static/n_differs_smaller|int}} variant-months, inconclusive in {{value:derived/label_free_val_rate/vs_static/n_inconclusive|int}} and larger in {{value:derived/label_free_val_rate/vs_static/n_differs_larger|int}}; delayed-label lag 1 is smaller in {{value:derived/delayed_lag1/vs_static/n_differs_smaller|int}}, inconclusive in {{value:derived/delayed_lag1/vs_static/n_inconclusive|int}} (including every month 4 cell, where lag 1 uses month 3 and so equals static by construction) and larger in {{value:derived/delayed_lag1/vs_static/n_differs_larger|int}}.
 
 The validation-rate strategy is slightly under budget in every month of Base, I and II and slightly over in months 5 to 7 of III, IV and V; the two groups of variants share different monthly fraud-rate profiles (reports/data_audit.md), and a fixed alert share turns a lower fraud rate into more flagged negatives, as in the synthetic mechanism study (reports/mechanism.md).
 

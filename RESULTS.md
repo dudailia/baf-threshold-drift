@@ -31,7 +31,7 @@ Replication of the paper's setup on Base (train months 0 to 5, test months 6 and
 
 With `month` as a feature, as in the paper's code, the mean TPR of the 5 best configurations is 0.552 with FPR ratio 0.339, inside the loose bound of 0.5 to 0.6 around the Figure 1 reading; without `month` it is 0.547.
 
-Shuffled-label check: FAILED. A LightGBM model trained on Base with labels shuffled within months 0 to 2 reached a pooled TPR of 0.117 at 5% FPR on months 4 to 7, outside the declared 0.05 plus or minus 0.02. The tripwire fired and the criterion was not redefined.
+Shuffled-label check: FAILED. A LightGBM model trained on Base with labels permuted across the pooled rows of months 0 to 2 reached a pooled TPR of 0.117 at 5% FPR on months 4 to 7, outside the declared 0.05 plus or minus 0.02. The tripwire fired and the criterion was not redefined.
 
 | check | months | positives | oracle_tpr_at_5pct_fpr | static_realized_fpr | static_tpr |
 |---|---|---|---|---|---|
@@ -233,7 +233,7 @@ With the threshold set on month 3, static is within 0.67 points of budget in mon
 
 Label-free top 5% sits 0.26 to 1.06 points under budget in every variant-month because frauds take part of a fixed 5% of alerts, and delayed-label lag 1 swings from -2.09 to +1.24 points, consistent with month-to-month score shifts that do not persist.
 
-Against static on absolute budget miss, label-free at the validation alert rate is smaller in 19 variant-months, inconclusive in 5 and larger in 0; delayed-label lag 1 is smaller in 8, inconclusive in 15 and larger in 1.
+Against static on absolute budget miss, label-free at the validation alert rate is smaller in 19 variant-months, inconclusive in 5 and larger in 0; delayed-label lag 1 is smaller in 8, inconclusive in 15 (including every month 4 cell, where lag 1 uses month 3 and so equals static by construction) and larger in 1.
 
 The validation-rate strategy is slightly under budget in every month of Base, I and II and slightly over in months 5 to 7 of III, IV and V; the two groups of variants share different monthly fraud-rate profiles (reports/data_audit.md), and a fixed alert share turns a lower fraud rate into more flagged negatives, as in the synthetic mechanism study (reports/mechanism.md).
 

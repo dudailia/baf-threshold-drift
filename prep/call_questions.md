@@ -1,6 +1,6 @@
 # Call prep: hard questions about this study
 
-The ten hardest questions a Feedzai researcher is likely to ask, with what a strong answer must contain. Every number is generated from `results/` and `results_posthoc/` by `src/trace.py`; nothing here is new analysis. Post hoc results (RESULTS_POSTHOC.md) were declared after the main results were seen and are labelled as such.
+The hardest questions a Feedzai researcher is likely to ask, with what a strong answer must contain. The questions after question 10 were added from a cold read by a fresh reviewer who saw only the README, REVIEWING.md, the one-pager, RESULTS.md and src/ (reports/hostile_review.md). Every number is generated from `results/` and `results_posthoc/` by `src/trace.py`; nothing here is new analysis. Post hoc results (RESULTS_POSTHOC.md) were declared after the main results were seen and are labelled as such.
 
 ## 1. The paper sets its threshold on the test labels. Is your "static" comparable to anything in the paper?
 
@@ -41,6 +41,44 @@ Lag 1 swings from -2.09 to +1.24 points; lags 2 and 3 mostly stay under budget (
 ## 10. Is the static miss a property of the tuned model, or would a different model drift differently?
 
 Logistic regression shows the same direction (-1.41 to -2.92 points). Post hoc, the other four of the five best tuning trials and a strongly regularised model change the sign of the static miss in 0 of 90 month cells from month 5 to month 7, with static misses of -2.16 to -0.35 points across them (RESULTS_POSTHOC.md section 3).
+
+## Added after the cold read
+
+### Label-free sets each month's threshold from that whole month's scores. Is that look-ahead?
+
+Yes, in a streaming setting, and a strong answer concedes it. The rule was declared before data (PROTOCOL.md, Thresholds: the 95th percentile of that month's scores), so it describes decisions made at month end, or a deployment that knows the month's score distribution in advance. Static and delayed-label do not get this information, so the comparison favours label-free. A deployable version would use the previous month's score quantile or a running quantile; that was not run. It would face the month-to-month score shifts that moved delayed-label lag 1 from -2.09 to +1.24 points, but how much was not measured.
+
+### With `month` dropped, do the velocity features act as a clock?
+
+A strong answer says this is open. `velocity_4w` has the largest PSI of the top 10 features in Base, II, III and IV (RESULTS.md section 1), and trees cannot extrapolate: a value beyond the training range lands in the edge leaf. The post hoc mechanism test replaced one feature at a time with month 3 draws (RESULTS_POSTHOC.md section 2), which breaks the dependence between the three velocity features and cannot see a joint effect. Dropping `velocity_6h`, `velocity_24h` and `velocity_4w` together, or replacing them jointly, was not run.
+
+### The shuffled-label check used the first sampled configuration, not the tuned model. What did it test?
+
+As declared before data (PROTOCOL.md, Implementation decisions: Base, first sampled configuration), it tests the pipeline (preprocessing, splits, thresholds) with one fixed LightGBM configuration, not the tuned model behind the results; the 20 repeat shuffles use the same configuration. The permutation is over the pooled rows of months 0 to 2 (src/checks.py), so it does not keep each training month's prevalence. Logistic regression, which needs no tuning, gives a TPR of 0.026 to 0.069 at 5% FPR over the same shuffles. Rerunning the check with each variant's tuned configuration, and with a within-month permutation, was not done.
+
+### A fired tripwire exits non-zero. How did `make all` finish and reproduce every file?
+
+The Makefile runs the shuffled check with a leading `-`, which ignores its exit status, with a comment citing the user's decision to keep the failure as a caveat (PROTOCOL.md decision log). The fired state is written to results/tripwires.json; every other check still stops the build. "Reproduced every file" means the outputs are byte-identical, not that the check passed.
+
+### How many independent pieces of evidence are behind "every static interval below zero in months 5 to 7"?
+
+Fewer than 18, and a strong answer says so. The six variants come from one generator and one base; Variants III, IV and V share one monthly fraud-rate profile and Base, I and II another (reports/data_audit.md). The intervals resample applications given one model, one split and one tuning run, so they measure only the resampling part of the uncertainty. The split matters more: with the threshold set on month 2 the sign reverses (question 3 above). The headline holds for the month 3 split; the effective number of independent replications was not measured.
+
+### FPR ratios are compared across strategies at different realized FPRs. Were they compared at matched FPR?
+
+No. Each strategy's ratio is read at its own realized FPR, and the ratio moves with the operating point, so part of any ratio difference restates the budget miss. Across global-threshold strategies the ratio differs by at most 0.094 within a variant-month. A comparison at matched realized FPR was not run.
+
+### Delayed-label assumes month m - k labels are complete when month m starts. Is that realistic?
+
+No: BAF gives final labels, while real application-fraud labels mature over months. Partial labels were not modelled. Lags 2 and 3 are the only proxy for slower labels here (RESULTS.md section 4), and they assume complete labels too.
+
+### Where does the "within 0.5 points" band come from?
+
+A strong answer concedes that it was chosen at the write-up, after the results were seen (commit 125042c), not declared in PROTOCOL.md; the only earlier 0.5-point thresholds are in the user's predictions 3 and 8. The declared primary comparison is the signed and absolute budget miss with paired intervals, which the band only summarises; counts at other bands were not computed.
+
+### What does `make check` actually prove?
+
+Two things, and a strong answer separates them. At render time (`make tables`, src/trace.py), every result number is written by a named-value placeholder from results/values.json or results_posthoc/values.json, and rendering refuses any number typed into a template unless it is declared as a text constant (months, targets, tolerances, counts of configurations and resamples) in the results manifests; so each result number corresponds to its key by construction. `make check` then confirms only that every printed number exists somewhere in the results files at the precision shown, which almost any short number does; on its own it would be weak. The independent recomputation of every stored metric is the stronger evidence (REVIEWING.md).
 
 ## What the study does not show
 
