@@ -19,6 +19,7 @@ from src.data import LABEL, MAIN_SPLIT, VARIANT_FILES, load_variant
 from src.models import fit_lgbm
 from src.posthoc.common import CKPT, PRED, ci_rows, commit, evaluate, load_months, log, main_pred_path, paired, save_pred, stamp, summarize, write
 from src.preprocess import LGBMPrep
+from src.schema import VALIDATION_MONTH
 
 REGULARISED = dict(n_estimators=200, max_depth=3, learning_rate=0.05, num_leaves=8, boosting="gbdt",
                    min_data_in_leaf=2000, max_bin=255, enable_bundle=True)
@@ -55,7 +56,7 @@ def run(c):
                     z = np.load(ck, allow_pickle=True)
                     pt, bt = list(z["point"]), z["boot"].item()
                 else:
-                    pt, bt = evaluate(load_months(path), v, 3, ["static"], config.N_BOOT if s == config.SEEDS[0] else 0)
+                    pt, bt = evaluate(load_months(path), v, VALIDATION_MONTH, ["static"], config.N_BOOT if s == config.SEEDS[0] else 0)
                     ck.parent.mkdir(parents=True, exist_ok=True)
                     np.savez(ck, point=np.array(pt, dtype=object), boot=np.array(bt, dtype=object))
                 base = dict(variant=v, config_label=label, config_rank=k, seed=s)

@@ -19,10 +19,11 @@ from src.data import VARIANT_FILES
 from src.fastboot import AGE_DEFS, AGE_BINS, CHUNK, resample_weights
 from src.posthoc.common import (CKPT, MAIN_STRATEGIES, TARGET, ci_rows, commit, load_months, log, main_boot, main_pred_path, paired,
                                 stamp, summarize, write)
+from src.schema import TEST_MONTHS, VALIDATION_MONTH
 from src.thresholds import _threshold_for_budget
 
 NAME = "label_free_isotonic"
-TEST = [4, 5, 6, 7]
+TEST = list(TEST_MONTHS)
 
 
 def _fit(s, y, w=None):
@@ -45,7 +46,7 @@ def _metrics(s, y, age, t, w):
 
 
 def _point(months):
-    s3, y3, _ = months[3]
+    s3, y3, _ = months[VALIDATION_MONTH]
     iso = _fit(s3, y3)
     out = []
     for m in TEST:
@@ -59,13 +60,13 @@ def _point(months):
 
 
 def _boot(months, variant, n_boot):
-    s3, y3, _ = months[3]
+    s3, y3, _ = months[VALIDATION_MONTH]
     acc = {m: [] for m in TEST}
     for c0 in range(0, n_boot, CHUNK):
         b = min(CHUNK, n_boot - c0)
-        W = {m: resample_weights(len(months[m][0]), CHUNK, ((variant,), m, c0))[:b].astype(float) for m in [3] + TEST}
+        W = {m: resample_weights(len(months[m][0]), CHUNK, ((variant,), m, c0))[:b].astype(float) for m in [VALIDATION_MONTH] + TEST}
         for i in range(b):
-            iso = _fit(s3, y3, W[3][i])
+            iso = _fit(s3, y3, W[VALIDATION_MONTH][i])
             for m in TEST:
                 s, y, age = months[m]
                 w = W[m][i]

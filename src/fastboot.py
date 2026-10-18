@@ -18,8 +18,10 @@ import hashlib
 
 import numpy as np
 
+from src.data import MAIN_SPLIT
+
 _EPS = 1e-9
-VALIDATION_MONTH = 3
+VALIDATION_MONTH = MAIN_SPLIT["validation"][0]
 CHUNK = 20  # resamples per chunk; fixed so that weights do not depend on memory settings
 LAGS = (1, 2, 3)
 STRATEGIES = ["static", "label_free_top", "label_free_val_rate", "delayed_lag1", "delayed_lag2", "delayed_lag3", "oracle",

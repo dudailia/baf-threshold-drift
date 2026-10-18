@@ -7,14 +7,16 @@ results/paired.csv   one row per KEYS + seed + comparator + metric: paired boots
                      interval of (strategy - comparator) and the PROTOCOL.md verdict.
 """
 
+from src.data import MAIN_SPLIT
+
 VARIANTS = ["Base", "Variant I", "Variant II", "Variant III", "Variant IV", "Variant V"]
 MODELS = ["lightgbm", "logreg"]
 PRIMARY_MODEL = "lightgbm"
 PRIMARY_TARGET = 0.05
 EXPLORATORY_TARGETS = [0.01, 0.02, 0.10]
 PRIMARY_AGE = ">=50"  # final choice recorded in PROTOCOL.md decision log
-TEST_MONTHS = [4, 5, 6, 7]
-VALIDATION_MONTH = 3
+TEST_MONTHS = list(MAIN_SPLIT["test"])  # split months are defined once, in src/data.py
+VALIDATION_MONTH = MAIN_SPLIT["validation"][0]
 
 PRIMARY_STRATEGIES = ["static", "label_free_top", "label_free_val_rate", "delayed_lag1", "oracle"]
 DELAY_STRATEGIES = ["delayed_lag1", "delayed_lag2", "delayed_lag3"]

@@ -17,6 +17,7 @@ from src import config
 from src.data import LABEL
 from src.fastboot import evaluate_months
 from src.guard import predictions_commit
+from src.schema import VALIDATION_MONTH
 
 OUT = Path(os.environ.get("BAF_POSTHOC_OUT", config.ROOT / "results_posthoc"))
 PRED = OUT / "predictions"
@@ -105,7 +106,7 @@ def main_boot(variant, n_boot):
     if path.exists():
         z = np.load(path, allow_pickle=True)
         return z["point"].item(), z["boot"].item()
-    pt, bt = evaluate(load_months(main_pred_path(variant)), variant, 3, MAIN_STRATEGIES, n_boot)
+    pt, bt = evaluate(load_months(main_pred_path(variant)), variant, VALIDATION_MONTH, MAIN_STRATEGIES, n_boot)
     point = {(r["strategy"], r["month"]): r for r in pt}
     path.parent.mkdir(parents=True, exist_ok=True)
     np.savez(path, point=np.array(point, dtype=object), boot=np.array(bt, dtype=object))

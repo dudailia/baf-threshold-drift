@@ -14,7 +14,7 @@ import pandas as pd
 from src import config
 from src.data import VARIANT_FILES
 from src.fastboot import evaluate_months
-from src.posthoc.common import CKPT, TARGET, commit, load_months, log, main_pred_path, stamp, write
+from src.posthoc.common import CKPT, OUT, TARGET, commit, load_months, log, main_pred_path, stamp, write
 from src.trace import verdict
 
 QS = [0.05, 0.0525, 0.055, 0.0575, 0.06]
@@ -33,7 +33,7 @@ def run(c):
     points, cis, pairs = [], [], []
     for v in config.VARIANT_SUBSET or list(VARIANT_FILES):
         iso_boot = np.load(CKPT / "isotonic_boot" / f"{v}.npz", allow_pickle=True)["boot"].item()
-        iso_point = pd.read_csv(config.ROOT / "results_posthoc" / "isotonic_metrics.csv")
+        iso_point = pd.read_csv(OUT / "isotonic_metrics.csv")
         iso_point = iso_point[(iso_point.variant == v) & (iso_point.seed == 0)].set_index("month")
         for s in config.SEEDS:
             months = load_months(main_pred_path(v, s))
