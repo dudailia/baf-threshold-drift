@@ -1,6 +1,6 @@
 # Handoff note
 
-Last updated 2026-10-16, after Stage K (write-up); waiting for the user's review. Read CLAUDE.md, PROTOCOL.md and this file before continuing. The running log with timestamps is reports/progress.md.
+Last updated 2026-10-18, after the review queue (cold read, leakage code review, visual check). Read CLAUDE.md, PROTOCOL.md and this file before continuing. The running log with timestamps is reports/progress.md.
 
 ## State
 
@@ -94,3 +94,16 @@ Queue finished. Next step: the user's review of RESULTS_POSTHOC.md section 7 and
 | 6 make check, make test, tag | done | tag v1.0-for-review on the final commit; not pushed |
 
 State: final. Tag v1.0-for-review marks the version for review. Nothing pushed; history not rewritten.
+
+## Review queue (2026-10-18)
+
+| Step | Status | Notes |
+|---|---|---|
+| 1 hostile cold read | done (e083103) | reports/hostile_review.md: fresh reviewer saw only README, REVIEWING, one-pager, RESULTS.md, src/. Section 6 resolves each concern from the repo. Nine questions added to prep/call_questions.md ("Added after the cold read"). RESULTS.md prose: month 4 identity noted beside the delayed-label inconclusive count; shuffle described as a pooled permutation. No number changed. |
+| 2 leakage code review | done (849ef64) | reports/code_review.md: fresh reviewer saw only PROTOCOL.md and src/. 0 wrong, 5 suspicious. Fixed without changing numbers: split months from `MAIN_SPLIT` only; fixedq path. Left as is: replication TPR at the ROC point vs FPR with `>` (fix would change results/replication.csv). 0 rows identical across months in any variant. |
+| 3 visual check | done (1306af0) | reports/visual_check.md: by-month figures in three columns, ROC ticks, units and legend fixed, titles state the month 4 overlap. Plotted data byte-identical before and after. One-pager PDF still one page; "at 5% FPR" added after the shuffled TPR in the one-pager, README and call prep. |
+| make check, make test | pass | 103 tests. |
+
+Open from the reviews (not resolvable without new analysis, so new post hoc work only if the user asks): label-free with a previous-month or running quantile; dropping or jointly replacing the velocity features; a generator boundary at month 3; shuffles with the tuned configurations and a within-month permutation; the effective number of independent replications; FPR ratio at matched realized FPR; partial labels for delayed-label; the "wrong null" explanation. The "within 0.5 points" band was chosen at the write-up (125042c), not declared in PROTOCOL.md; it is disclosed in the call prep only, and whether to say so in RESULTS.md is the user's call.
+
+Tag v1.0-for-review still points at 0e765ae; it was not moved. Nothing pushed; history not rewritten.
