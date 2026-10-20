@@ -1,6 +1,6 @@
 # Outreach drafts
 
-Drafts supplied by the user on 2026-10-19, checked number by number against results/ and results_posthoc/ (values.json keys, which the traced documents print). Marks: MATCH (same value and meaning), MISMATCH (wrong), QUALIFIED (right value, but the amendment, a post hoc split or an audit narrows what it means). Every rewritten message is under 600 characters, with the repository URL in place, and has no em dashes. The original text is kept below each check table.
+Drafts supplied by the user on 2026-10-19, checked number by number against results/ and results_posthoc/ (values.json keys, which the traced documents print). Marks: MATCH (same value and meaning), MISMATCH (wrong), QUALIFIED (right value, but the amendment, a post hoc split or an audit narrows what it means). Every final message is under 600 characters with the repository URL in place, and has no em dashes. The original text is kept verbatim, with its [repo link] placeholder, below each check table; the URL replaces the placeholder in the final texts.
 
 ## Jean V. Alves (Feedzai)
 
@@ -15,9 +15,9 @@ Original (519 characters):
 
 > Hi Jean, thanks for connecting. Your FiFAR work treats analyst capacity as a hard limit, so this result from my BAF study seemed relevant: a threshold set once at 5% FPR under-spent its budget by 0.87 to 2.32 points in months 5 to 7, and set on a different month it over-spent instead. Repo: [repo link]. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes to tell me where the protocol is weakest?
 
-Final (rewritten, 548 characters with the placeholder):
+Final (rewritten; 584 characters):
 
-Hi Jean, thanks for connecting. Your FiFAR work treats analyst capacity as a hard limit, so this result from my BAF study seemed relevant: a threshold set at 5% FPR on month 3 under-spent its budget by 0.87 to 2.32 points in months 5 to 7, and post hoc, trained on months 0 and 1 and set on month 2, it over-spent. Repo: [repo link]. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes to tell me where the protocol is weakest?
+Hi Jean, thanks for connecting. Your FiFAR work treats analyst capacity as a hard limit, so this result from my BAF study seemed relevant: a threshold set at 5% FPR on month 3 under-spent its budget by 0.87 to 2.32 points in months 5 to 7, and post hoc, trained on months 0 and 1 and set on month 2, it over-spent. Repo: https://github.com/dudailia/baf-threshold-drift. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes to tell me where the protocol is weakest?
 
 ## Vasco Pearson (Feedzai)
 
@@ -33,9 +33,9 @@ Original (481 characters):
 
 > Hi Vasco, thanks for connecting. I ran a threshold study on the BAF suite. The result I trust most: with the model held fixed, whether a 5% FPR threshold under- or over-spends its budget later depends on the month it was set on, flipping in 9 of 18 variant-months. One of my own sanity checks failed, and the repo says so. Repo: [repo link]. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes to pick it apart?
 
-Final (rewritten, 500 characters with the placeholder):
+Final (rewritten; 536 characters):
 
-Hi Vasco, thanks for connecting. I ran a threshold study on the BAF suite. The result I trust most (post hoc): with the model held fixed, a 5% FPR threshold set on month 3 or 4 under-spends its budget in months 5 to 7, while one set on month 5 over-spends in 9 of its 12 later cells. One of my own sanity checks failed, and the repo says so. Repo: [repo link]. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes to pick it apart?
+Hi Vasco, thanks for connecting. I ran a threshold study on the BAF suite. The result I trust most (post hoc): with the model held fixed, a 5% FPR threshold set on month 3 or 4 under-spends its budget in months 5 to 7, while one set on month 5 over-spends in 9 of its 12 later cells. One of my own sanity checks failed, and the repo says so. Repo: https://github.com/dudailia/baf-threshold-drift. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes to pick it apart?
 
 ## Francisco Souza e Silva (Feedzai)
 
@@ -50,9 +50,9 @@ Original (493 characters):
 
 > Hi Francisco, thanks for connecting. One result from my BAF threshold study: in Variant IV the older age group received 89% of label-free alerts while making up 51% of applications, and switching between global threshold rules moved the age FPR ratio by at most 0.094. Recalibration holds the budget and leaves the group split where it was. Repo: [repo link]. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes this month?
 
-Final (rewritten, 530 characters with the placeholder):
+Final (rewritten; 566 characters):
 
-Hi Francisco, thanks for connecting. One result from my BAF threshold study: in Variant IV, months 6 and 7, the older age group received about 89% of label-free top 5% alerts while making up 51% of applications, and switching between global threshold rules moved the age FPR ratio by at most 0.094. Recalibration changes the budget miss and leaves the group split where it was. Repo: [repo link]. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes this month?
+Hi Francisco, thanks for connecting. One result from my BAF threshold study: in Variant IV, months 6 and 7, the older age group received about 89% of label-free top 5% alerts while making up 51% of applications, and switching between global threshold rules moved the age FPR ratio by at most 0.094. Recalibration changes the budget miss and leaves the group split where it was. Repo: https://github.com/dudailia/baf-threshold-drift. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes this month?
 
 ## João David (Feedzai)
 
@@ -67,9 +67,9 @@ Original (463 characters):
 
 > Hi João, thanks for connecting. A result from my BAF threshold study that surprised me: monthly retraining raised detection, and it also ran at a higher realized FPR than lag-1 recalibration in 16 of 18 cells, with the two gains correlated at 0.81. At equal budget the gain is not established. Repo: [repo link]. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes to tell me what I'm missing?
 
-Final (rewritten, 512 characters with the placeholder):
+Final (rewritten; 548 characters):
 
-Hi João, thanks for connecting. A result from my BAF threshold study that surprised me: monthly retraining (post hoc) changed TPR by -0.67 to +6.61 points against lag-1 recalibration, but ran at a higher realized FPR in 16 of 18 variant-months, with the TPR and FPR differences correlated at 0.81. At equal budget the gain is not established. Repo: [repo link]. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes to tell me what I'm missing?
+Hi João, thanks for connecting. A result from my BAF threshold study that surprised me: monthly retraining (post hoc) changed TPR by -0.67 to +6.61 points against lag-1 recalibration, but ran at a higher realized FPR in 16 of 18 variant-months, with the TPR and FPR differences correlated at 0.81. At equal budget the gain is not established. Repo: https://github.com/dudailia/baf-threshold-drift. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes to tell me what I'm missing?
 
 ## Inês Oliveira e Silva (Feedzai)
 
@@ -84,9 +84,9 @@ Original (492 characters):
 
 > Hi Inês, thanks for connecting. A small result from my BAF threshold study: a rule that flags the top 5.75% of each month's applications (chosen post hoc) stayed within 0.5 points of a 5% FPR budget in 24 of 24 variant-months. Isotonic calibration matched it and added little. Most of that is arithmetic at BAF's fraud rate, and the write-up says so. Repo: [repo link]. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes?
 
-Final (unchanged, 492 characters with the placeholder):
+Final (unchanged; 528 characters):
 
-Hi Inês, thanks for connecting. A small result from my BAF threshold study: a rule that flags the top 5.75% of each month's applications (chosen post hoc) stayed within 0.5 points of a 5% FPR budget in 24 of 24 variant-months. Isotonic calibration matched it and added little. Most of that is arithmetic at BAF's fraud rate, and the write-up says so. Repo: [repo link]. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes?
+Hi Inês, thanks for connecting. A small result from my BAF threshold study: a rule that flags the top 5.75% of each month's applications (chosen post hoc) stayed within 0.5 points of a 5% FPR budget in 24 of 24 variant-months. Isotonic calibration matched it and added little. Most of that is arithmetic at BAF's fraud rate, and the write-up says so. Repo: https://github.com/dudailia/baf-threshold-drift. I'm looking for a Jan to Jun 2027 research co-op in Lisbon, with the right to work in Portugal. Would you have 20 minutes?
 
 ## Danielle Caled (Riskified)
 
@@ -100,9 +100,9 @@ Original (505 characters):
 
 > Hi Danielle, thanks for connecting. Chargeback labels arrive late, so this result from my study on Feedzai's public BAF data may be relevant: recalibrating a 5% FPR threshold on last month's labels swung from -2.09 to +1.24 points around budget, while a label-free rule matching the validation alert rate stayed within 0.5 points in 22 of 24 variant-months. Repo: [repo link]. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 co-op in Lisbon. Would you have 20 minutes?
 
-Final (unchanged, 505 characters with the placeholder):
+Final (unchanged; 541 characters):
 
-Hi Danielle, thanks for connecting. Chargeback labels arrive late, so this result from my study on Feedzai's public BAF data may be relevant: recalibrating a 5% FPR threshold on last month's labels swung from -2.09 to +1.24 points around budget, while a label-free rule matching the validation alert rate stayed within 0.5 points in 22 of 24 variant-months. Repo: [repo link]. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 co-op in Lisbon. Would you have 20 minutes?
+Hi Danielle, thanks for connecting. Chargeback labels arrive late, so this result from my study on Feedzai's public BAF data may be relevant: recalibrating a 5% FPR threshold on last month's labels swung from -2.09 to +1.24 points around budget, while a label-free rule matching the validation alert rate stayed within 0.5 points in 22 of 24 variant-months. Repo: https://github.com/dudailia/baf-threshold-drift. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 co-op in Lisbon. Would you have 20 minutes?
 
 ## João Margato (Riskified)
 
@@ -117,9 +117,9 @@ Original (477 characters):
 
 > Hi João, thanks for connecting. One result from my study on Feedzai's public BAF fraud data: when the injected bias is removed after month 5, detection drops for every threshold strategy, the oracle included (75.1% to 33.6% TPR in Variant V). Recalibration can hold an alert budget. It can't repair a ranking that has gone stale. Repo: [repo link]. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 co-op in Lisbon. Would you have 20 minutes?
 
-Final (rewritten, 533 characters with the placeholder):
+Final (rewritten; 569 characters):
 
-Hi João, thanks for connecting. One result from my study on Feedzai's public BAF fraud data: in Variant V, when the injected bias is removed after month 5, TPR drops for every threshold strategy. The Oracle (upper bound) at 5% FPR falls from 75.1% TPR in months 4 and 5 to 33.6% in months 6 and 7. Recalibration moves the operating point; it can't repair a ranking that has gone stale. Repo: [repo link]. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 co-op in Lisbon. Would you have 20 minutes?
+Hi João, thanks for connecting. One result from my study on Feedzai's public BAF fraud data: in Variant V, when the injected bias is removed after month 5, TPR drops for every threshold strategy. The Oracle (upper bound) at 5% FPR falls from 75.1% TPR in months 4 and 5 to 33.6% in months 6 and 7. Recalibration moves the operating point; it can't repair a ranking that has gone stale. Repo: https://github.com/dudailia/baf-threshold-drift. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 co-op in Lisbon. Would you have 20 minutes?
 
 ## Pankaj Dhariwal (Hesper AI)
 
@@ -134,9 +134,9 @@ Original (487 characters):
 
 > Hi Pankaj, thanks for connecting. I recently finished a threshold study on Feedzai's public bank fraud data. Short version: a threshold set once at 5% FPR under-spent its budget by up to 2.32 points in later months, or over-spent by up to 5.82 when set on another month. A fixed alert share held budget far better. Repo: [repo link]. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 co-op. Would you have 20 minutes to tell me what Hesper is building?
 
-Final (rewritten, 543 characters with the placeholder):
+Final (rewritten; 579 characters):
 
-Hi Pankaj, thanks for connecting. I finished a threshold study on Feedzai's public bank fraud data. Short version: a threshold set at 5% FPR on month 3 under-spent by up to 2.32 points in months 5 to 7; post hoc, trained on months 0 and 1 and set on month 2, it over-spent by up to 5.82. Matching month 3's alert rate stayed within 0.5 points in 22 of 24 variant-months. Repo: [repo link]. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 co-op. Would you have 20 minutes to tell me what Hesper is building?
+Hi Pankaj, thanks for connecting. I finished a threshold study on Feedzai's public bank fraud data. Short version: a threshold set at 5% FPR on month 3 under-spent by up to 2.32 points in months 5 to 7; post hoc, trained on months 0 and 1 and set on month 2, it over-spent by up to 5.82. Matching month 3's alert rate stayed within 0.5 points in 22 of 24 variant-months. Repo: https://github.com/dudailia/baf-threshold-drift. I'm a mathematics and business student at Northeastern looking for a Jan to Jun 2027 co-op. Would you have 20 minutes to tell me what Hesper is building?
 
 ## LinkedIn post
 
@@ -155,6 +155,6 @@ Original (596 characters):
 
 > I spent the last week on a threshold study using Feedzai's public Bank Account Fraud dataset suite (Jesus et al., NeurIPS 2022). The question: if you set a fraud model's threshold once for a 5% false positive rate, does it stay on budget? On BAF it didn't. Set on month 3, it under-spent by 0.87 to 2.32 points in months 5 to 7. Set on month 2, it over-spent by up to 5.82. Bootstrap intervals were 0.23 to 0.32 points wide. I wrote down 15 predictions before training anything. 7 held. One of my own sanity checks failed, and the repo explains why. Code, data audit and every number: [repo link]
 
-Final (rewritten, 563 characters with the placeholder):
+Final (rewritten; 599 characters):
 
-I ran a threshold study on Feedzai's public Bank Account Fraud suite (Jesus et al., NeurIPS 2022). Does a fraud threshold set once at a 5% false positive rate stay on budget? On BAF it didn't. Set on month 3, it under-spent by 0.87 to 2.32 points in months 5 to 7 (bootstrap intervals 0.23 to 0.32 points wide). Post hoc, trained on months 0 and 1 and set on month 2, it over-spent by up to 5.82. I wrote down 14 predictions before training anything, scored as 15 lines; 7 held. One sanity check failed, and the repo reports it. Code and every number: [repo link]
+I ran a threshold study on Feedzai's public Bank Account Fraud suite (Jesus et al., NeurIPS 2022). Does a fraud threshold set once at a 5% false positive rate stay on budget? On BAF it didn't. Set on month 3, it under-spent by 0.87 to 2.32 points in months 5 to 7 (bootstrap intervals 0.23 to 0.32 points wide). Post hoc, trained on months 0 and 1 and set on month 2, it over-spent by up to 5.82. I wrote down 14 predictions before training anything, scored as 15 lines; 7 held. One sanity check failed, and the repo reports it. Code and every number: https://github.com/dudailia/baf-threshold-drift

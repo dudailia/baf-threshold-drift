@@ -12,7 +12,7 @@ First pass (2026-10-19, commit ef8221b) and second pass (2026-10-19, after the u
 | 4 Data and privacy | PASS | PASS; history accepted by the user as is (decision C) |
 | 5 Outreach numbers | FAIL (no drafts received) | PASS after rewrites (5b) |
 | 6 Visual check | PASS | PASS |
-| 7 Publish | NOT RUN | see section 7b |
+| 7 Publish | NOT RUN | PASS: public repository https://github.com/dudailia/baf-threshold-drift; a fresh clone passes `make test` (7b) |
 
 ## 1. Reviews
 
@@ -658,3 +658,81 @@ The PDF was not rebuilt, because reports/one_pager.md, the PDF and figures/ are 
 ## 7. Publish
 
 Not run, because items 3 and 5 failed. Nothing was created on GitHub, no remote was added and nothing was pushed. `gh auth status` was run read-only so that the instructions below are correct. It reports a login to github.com as account dudailia, protocol https, with the `repo` scope. The repository's branch is `main`; there is no `master` branch.
+
+### 7b. Publish (decision E)
+
+A, B and D pass, and decision C accepts the history as it is (email and old absolute paths, no rewrite), so the repository was published. The local branch is `main`; there is no `master`. The token line of `gh auth status` is left out.
+
+```
+$ gh auth status 2>&1 | grep -v Token
+github.com
+  ✓ Logged in to github.com account dudailia (keyring)
+  - Active account: true
+  - Git operations protocol: https
+
+$ gh repo view dudailia/baf-threshold-drift --json url 2>&1; echo "exit=$?"
+GraphQL: Could not resolve to a Repository with the name 'dudailia/baf-threshold-drift'. (repository)
+exit=1
+
+$ gh repo create dudailia/baf-threshold-drift --public; echo "exit=$?"
+https://github.com/dudailia/baf-threshold-drift
+exit=0
+
+$ git remote add origin https://github.com/dudailia/baf-threshold-drift.git; git remote -v
+origin	https://github.com/dudailia/baf-threshold-drift.git (fetch)
+origin	https://github.com/dudailia/baf-threshold-drift.git (push)
+
+$ git push -u origin main 2>&1; echo "exit=$?"
+To https://github.com/dudailia/baf-threshold-drift.git
+ * [new branch]      main -> main
+branch 'main' set up to track 'origin/main'.
+exit=0
+
+$ git push origin --tags 2>&1; echo "exit=$?"
+To https://github.com/dudailia/baf-threshold-drift.git
+ * [new tag]         v1.0-for-review -> v1.0-for-review
+exit=0
+
+$ git ls-remote origin
+027daf2b74962f3dd0acbe6b26f61e931a57b95a	HEAD
+027daf2b74962f3dd0acbe6b26f61e931a57b95a	refs/heads/main
+4356450d737b81cb929c9f65e57d37b53a02ee0f	refs/tags/v1.0-for-review
+0e765ae8f7611c3385183f064f3c66ab09b25740	refs/tags/v1.0-for-review^{}
+
+$ git rev-parse HEAD v1.0-for-review^{commit}
+027daf2b74962f3dd0acbe6b26f61e931a57b95a
+0e765ae8f7611c3385183f064f3c66ab09b25740
+
+$ gh repo view dudailia/baf-threshold-drift --json url,visibility,defaultBranchRef
+{"defaultBranchRef":{"name":"main"},"url":"https://github.com/dudailia/baf-threshold-drift","visibility":"PUBLIC"}
+```
+
+Fresh clone into a new temporary directory, new venv from requirements.txt, `make test`:
+
+```
+$ D=$(mktemp -d <scratchpad>/clone.XXXXXX); git clone https://github.com/dudailia/baf-threshold-drift.git "$D/r" 2>&1; echo "exit=$?"
+Cloning into '<clone>/r'...
+exit=0
+
+$ git -C "$D/r" log --oneline -1; git -C "$D/r" tag; ls "$D/r/data" 2>&1
+027daf2 Resolve the five suspicious leakage items; narrowed pre-registration check; check outreach drafts
+v1.0-for-review
+ls: <clone>/r/data: No such file or directory
+
+$ cd "$D/r" && make setup > ../setup.log 2>&1; echo "exit=$?"; tail -1 ../setup.log
+exit=0
+[notice] To update, run: <clone>/r/.venv/bin/python3 -m pip install --upgrade pip
+
+$ cd "$D/r" && make test; echo "exit=$?"
+.venv/bin/python -m pytest -q
+........................................................................ [ 65%]
+......................................                                   [100%]
+110 passed in 86.76s (0:01:26)
+exit=0
+
+$ cd "$D/r" && git status --short; echo "exit=$?"
+exit=0
+```
+
+Verdict: PASS. The repository is public at https://github.com/dudailia/baf-threshold-drift, with `main` (027daf2) and tag v1.0-for-review (still on 0e765ae). The clone has no data/ folder and passes all 110 tests. `[repo link]` is replaced with that URL in the final texts of reports/outreach_drafts.md. The commit that adds this section and the URL is pushed after it; its hash is in `git log origin/main`.
+
