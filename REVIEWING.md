@@ -4,13 +4,17 @@ Every departure from the brief or the paper is listed, with reasons and commits,
 
 ## 1. Pre-registration
 
-PREDICTIONS.md was committed in `0be4b0d` ("Pre-register predictions"), before any model was trained. It holds the user's 12 answers to an interview about expected budget misses, TPR and age-group FPR ratios (Base and Variants I to III, then Variants IV and V separately), plus two additional predictions, each with a stated confidence. The rules used to score them were declared in PROTOCOL.md ("Scoring rules for PREDICTIONS.md") in `290a3c0`, also before the main run.
+PREDICTIONS.md was committed in `0be4b0d` ("Pre-register predictions") and has not changed since. It holds the user's 12 answers to an interview about expected budget misses, TPR and age-group FPR ratios (Base and Variants I to III, then Variants IV and V separately), plus two additional predictions, each with a stated confidence. The rules used to score them were declared in PROTOCOL.md ("Scoring rules for PREDICTIONS.md") in `290a3c0`, an ancestor of the first commit with model results (`6d0ce24`).
 
-To confirm that results came after it:
+What git shows, and no more. `0be4b0d` is an ancestor of the first commit that wrote any BAF-derived result (the data audit, `11f2b3d`) and of every later commit that touches results/ or results_posthoc/. One file in results/ is older: results/synthetic/mechanism.csv (`13e37ad`), which holds only simulated data from src/synthetic.py and reads no BAF file. data/raw/ is in .gitignore, so git cannot show when the BAF CSV files arrived on disk. reports/final_check.md, item 3, records both the original check, which failed because of the synthetic file, and this narrowed one.
+
+To check:
 
 ```
 git log --format='%h %ad %s' --date=iso -- PREDICTIONS.md   # one commit only: 0be4b0d
-git merge-base --is-ancestor 0be4b0d 9c04644 && echo "main results came after the pre-registration"
+git diff --exit-code 0be4b0d -- PREDICTIONS.md               # exit 0: unchanged since
+for c in $(git log --format=%h -- results/ results_posthoc/ ':(exclude)results/synthetic'); do
+  git merge-base --is-ancestor 0be4b0d $c || echo "$c is not after the pre-registration"; done   # prints nothing
 .venv/bin/python -m src.guard                                # fails if PREDICTIONS.md changed since 0be4b0d
 head -c 300 results/metrics.csv                              # every results file carries predictions_commit = 0be4b0d...
 ```

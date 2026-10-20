@@ -16,6 +16,7 @@ from src.schema import (
     PRIMARY_STRATEGIES,
     PRIMARY_TARGET,
     TEST_MONTHS,
+    VALIDATION_MONTH,
     VARIANTS,
 )
 
@@ -86,8 +87,8 @@ class _Cells:
 
     def source_note(self, v, s, m):
         r = self.meta.get((v, s, m))
-        if s.startswith("delayed") and r is not None and r.available and r.source_month == 3:
-            return " (equals static: source month 3)"
+        if s.startswith("delayed") and r is not None and r.available and r.source_month == VALIDATION_MONTH:
+            return f" (equals static: source month {VALIDATION_MONTH})"
         return ""
 
 

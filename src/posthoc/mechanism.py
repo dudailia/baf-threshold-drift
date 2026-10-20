@@ -25,7 +25,8 @@ from src.preprocess import LGBMPrep
 from src.thresholds import threshold_at_fpr
 
 N_DRAWS = 5
-MONTHS = [3, 4, 5, 6, 7]
+MONTHS = MAIN_SPLIT["validation"] + MAIN_SPLIT["test"]  # split months are defined once, in src/data.py
+VAL = MAIN_SPLIT["validation"][0]
 
 
 def run(c):
@@ -41,16 +42,16 @@ def run(c):
         refit = model.predict_proba(prep.transform(ev))[:, 1]
         checks.append(dict(variant=v, max_abs_diff_refit_vs_saved=float(np.max(np.abs(refit - z["score"])))))
         score, label, month = z["score"], z["label"], z["month"]
-        neg3 = score[(month == 3) & (label == 0)]
-        t = threshold_at_fpr(score[month == 3], label[month == 3], TARGET)
+        neg3 = score[(month == VAL) & (label == 0)]
+        t = threshold_at_fpr(score[month == VAL], label[month == VAL], TARGET)
         for m in MONTHS:
             neg = score[(month == m) & (label == 0)]
             fpr = float((neg >= t).mean())
             q_rows.append(dict(variant=v, month=m, static_threshold=t, threshold_quantile_in_negatives=float((neg < t).mean()),
-                               realized_fpr=fpr, one_minus_fpr=1 - fpr, ks_vs_month3_negatives=float(ks_2samp(neg3, neg).statistic) if m != 3 else 0.0))
+                               realized_fpr=fpr, one_minus_fpr=1 - fpr, ks_vs_month3_negatives=float(ks_2samp(neg3, neg).statistic) if m != VAL else 0.0))
         top = sorted(meta["gain_importance"], key=meta["gain_importance"].get, reverse=True)[:10]
         neg_rows = ev[(ev[LABEL] == 0)]
-        ref = neg_rows[neg_rows.month == 3]
+        ref = neg_rows[neg_rows.month == VAL]
         old_ref = ref.customer_age >= 50
         for m in MONTHS[1:]:
             cur = neg_rows[neg_rows.month == m]

@@ -111,3 +111,7 @@ Tag v1.0-for-review still points at 0e765ae; it was not moved. Nothing pushed; h
 ## Final check (2026-10-19)
 
 reports/final_check.md has each command and its raw output. Items 1 (reviews), 2 (make test, make check), 4 (data and privacy in tracked files) and 6 (visual check) PASS. Item 3 FAILS as written, because results/synthetic/mechanism.csv (13e37ad, simulation only, no BAF data) was committed before PREDICTIONS.md (0be4b0d). PREDICTIONS.md is unchanged, and every BAF result came after it. Item 5 FAILS because the task message contained no outreach drafts (reports/outreach_drafts.md). Item 7 (publish) was not run: no GitHub repository, no remote, nothing pushed. Before publishing, note that the history has the personal email on all 64 commits and old absolute paths in 94 file versions. No number in results/ or results_posthoc/ changed, PREDICTIONS.md was not edited and history was not rewritten.
+
+## Final check, second pass (2026-10-19)
+
+The user's decisions A to E are in reports/final_check.md: sections 1b, 3b, 5b and 7b. Item 3 keeps its FAIL; the narrowed check passes. Leakage items: 13c, 13f, 13g and 13i are fine; 13h was wrong (an incomplete fix in 849ef64) and is fixed with no number changed (tests/test_review_items.py, 110 tests). The outreach drafts were checked and rewritten in reports/outreach_drafts.md. Publishing is recorded in section 7b.

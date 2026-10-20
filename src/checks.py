@@ -104,7 +104,8 @@ def shuffled(commit):
     ev = df[df["month"].isin(MAIN_SPLIT["validation"] + MAIN_SPLIT["test"])]
     s = model.predict_proba(prep.transform(ev))[:, 1]
     y, m = ev[LABEL].to_numpy(), ev["month"].to_numpy()
-    t_static = threshold_at_fpr(s[m == 3], y[m == 3], 0.05)
+    val = MAIN_SPLIT["validation"][0]
+    t_static = threshold_at_fpr(s[m == val], y[m == val], 0.05)
     rows = []
     test = np.isin(m, MAIN_SPLIT["test"])
     for label, mask in [(str(k), m == k) for k in MAIN_SPLIT["test"]] + [("4-7 pooled", test)]:

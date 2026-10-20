@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 
 from src.posthoc.common import OUT
+from src.schema import TEST_MONTHS, VALIDATION_MONTH
 
 
 def config_root():
@@ -80,7 +81,7 @@ def build():
     psi_path = config_root() / "results" / "psi.csv"
     if psi_path.exists():
         ps = pd.read_csv(psi_path)
-        cols = [f"psi_month_{m}" for m in range(3, 8)]
+        cols = [f"psi_month_{m}" for m in [VALIDATION_MONTH] + TEST_MONTHS]
         top = {v: {g.loc[g[c].idxmax(), "feature"] for c in cols} for v, g in ps.groupby("variant")}
         for feat in ("velocity_4w", "credit_risk_score"):
             vs = [v for v, fs in top.items() if fs == {feat}]
@@ -126,7 +127,7 @@ def _rolling(s, c, d):
 
 def _mechanism(q, f, rc, d):
     d["mechanism/refit_max_abs_diff"] = float(rc.max_abs_diff_refit_vs_saved.max())
-    test = q[q.month >= 4]
+    test = q[q.month.isin(TEST_MONTHS)]
     _range(test.ks_vs_month3_negatives, "mechanism/ks", d)
     _range(test.threshold_quantile_in_negatives, "mechanism/quantile", d)
     late = test[test.month.isin(LATE)]
